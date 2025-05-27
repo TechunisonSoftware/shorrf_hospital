@@ -5,13 +5,14 @@
 
 import dateutil
 
+
 import frappe
 from frappe import _
 from frappe.contacts.address_and_contact import load_address_and_contact
 from frappe.contacts.doctype.contact.contact import get_default_contact
 from frappe.model.document import Document
-from frappe.model.naming import set_name_by_naming_series, set_name_from_naming_options
-from frappe.utils import cint, cstr, getdate
+from frappe.model.naming import set_name_by_naming_series
+from frappe.utils import cint, cstr, getdate,now_datetime
 from frappe.utils.nestedset import get_root_of
 
 from erpnext import get_default_currency
@@ -38,6 +39,12 @@ class Patient(Document):
 
 	def before_insert(self):
 		self.set_missing_customer_details()
+
+	def before_save(self):			
+		if not self.registration_date:
+			current_time = now_datetime()
+			self.registration_date = current_time.strftime('%Y-%m-%d %I:%M:%S %p')
+       		
 
 	def after_insert(self):
 		if frappe.db.get_single_value("Healthcare Settings", "collect_registration_fee"):
@@ -139,10 +146,8 @@ class Patient(Document):
 		patient_name_by = frappe.db.get_single_value("Healthcare Settings", "patient_name_by")
 		if patient_name_by == "Patient Name":
 			self.name = self.get_patient_name()
-		elif patient_name_by == "Naming Series":
-			set_name_by_naming_series(self)
 		else:
-			set_name_from_naming_options(frappe.get_meta(self.doctype).autoname, self)
+			set_name_by_naming_series(self)
 
 	def get_patient_name(self):
 		self.set_full_name()
@@ -319,7 +324,6 @@ def make_invoice(patient, company):
 	uom = frappe.db.exists("UOM", "Nos") or frappe.db.get_single_value("Stock Settings", "stock_uom")
 	sales_invoice = frappe.new_doc("Sales Invoice")
 	sales_invoice.customer = frappe.db.get_value("Patient", patient, "customer")
-	sales_invoice.patient = patient
 	sales_invoice.due_date = getdate()
 	sales_invoice.company = company
 	sales_invoice.is_pos = 0
@@ -355,3 +359,103 @@ def get_patient_detail(patient):
 		vital_sign[0].pop("inpatient_record")
 		details.update(vital_sign[0])
 	return details
+
+@frappe.whitelist()
+def generate_uid(company):       
+    # year = frappe.utils.nowdate().split("-")[0]
+    company_abbr  = frappe.db.get_value("Company", {"company_name": company}, "abbr")    
+    if not company_abbr:
+        frappe.throw(f"Company not found ")
+    uid = frappe.model.naming.make_autoname(f"{company_abbr}.YY.######")     
+    return uid
+
+
+
+# import requests
+# @frappe.whitelist()
+# def send_whatsapp_message(to_number, message_text):
+# 	print("Sending WhatsApp message...")
+# 	settings = frappe.get_single("WhatsApp Settings")
+# 	token = "EAAJojhxqJVIBOwLw88tkBeXLvZAqRRtjbRYDPpMCeBMmTVdCwru1fkmkC1ZAtflDFpmoZAwZBhnfw4FeQ9uRKMPE3RFyH4NhwyCW1PuBqfCyZCpzZBBt1u6sDnZCPPym0kYSl0bZBBs1tmZBzu7JbbZB5o38Mq2Ez6LwNabZCCMvkJztor7rwJGBlBIe1LhCuWs"
+# 	phone_number_id = settings.phone_id
+
+# 	print("Token:", token)
+# 	print("Phone Number ID:", phone_number_id)
+	
+# 	url = f"https://graph.facebook.com/v22.0/{phone_number_id}/messages"
+	
+# 	headers = {
+#         "Authorization": f"Bearer {token}",
+#         "Content-Type": "application/json"
+#     }
+	
+# 	payload ={
+#         "messaging_product": "whatsapp",
+#         "to": to_number,
+#         "type": "text",
+#         "text": {
+#             "body": message_text
+#         }
+#     }
+# 	{
+# 		"messaging_product": "whatsapp",
+# 		"to": to_number,
+# 		"type": "template",
+# 		"name": "welcome_new_user",
+# 		"category": "marketing",
+# 		"language": "en_US",
+# 		"components": [
+# 			{
+# 			"type": "BODY",
+# 			"text": message_text
+# 			},
+# 		]
+# }
+	
+	# res = requests.post(url, json=payload, headers=headers)
+	# if res.status_code != 200:
+	# 	frappe.throw(f"WhatsApp message failed: {res.text}")
+
+	# print("Message sent, response:", res.status_code)
+	# return res.json()
+
+# def on_save(doc, method):
+# 	print("Inside on_save method............................................")
+# 	phone = doc.mobile
+# 	message = f"Hi {doc.first_name}, thank you for registering with Sai aarogya Bapatla. We look forward to supporting your healthcare journey. If you have any questions, feel free to reach out."
+# 	if phone:
+# 			print("Sending Phone Number...........")
+# 			send_whatsapp_message(phone, message)
+
+# import requests
+# import json
+# @frappe.whitelist()
+
+# def send_whatsapp_using_webhook(patient_name):
+#     patient = frappe.get_doc("Patient", patient_name)
+
+#     if not patient.check_mobile:
+#         return {"status": "error", "message": "Patient has not opted in for WhatsApp"}
+
+#     if not patient.mobile:
+#         return {"status": "error", "message": "Patient has no mobile number"}
+
+#     url = "https://b159-183-82-250-117.ngrok-free.app/api/method/frappe_whatsapp.api.send_template_message"
+#     headers = {
+#         "Authorization": "token 1a9b7378f460c05:d219853c5d7cab2",
+#         "Content-Type": "application/json"
+#     }
+
+#     payload = {
+#         "phone_number": patient.mobile,
+#         "template_name": "account_creation_confirmation_3",
+#         "language": "en_US",
+#         "params": [patient.first_name]
+#     }
+
+#     response = requests.post(url, headers=headers, data=json.dumps(payload))
+
+#     if response.ok:
+#         return {"status": "sent", "message": response.json()}
+#     else:
+#         return {"status": "error", "message": response.text}

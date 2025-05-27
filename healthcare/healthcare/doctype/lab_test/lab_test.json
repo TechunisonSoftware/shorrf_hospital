@@ -12,10 +12,12 @@
   "template",
   "lab_test_name",
   "lab_test_group",
+  "patient_encounter",
   "department",
   "column_break_26",
   "company",
   "status",
+  "lab_status",
   "date",
   "time",
   "submitted_date",
@@ -27,12 +29,14 @@
   "sb_first",
   "patient",
   "patient_name",
+  "uid",
   "patient_age",
   "patient_sex",
   "inpatient_record",
   "report_preference",
   "email",
   "mobile",
+  "specimen",
   "c_b",
   "service_unit",
   "practitioner",
@@ -55,7 +59,7 @@
   "sb_sensitivity",
   "sensitivity_test_items",
   "sb_comments",
-  "lab_test_comment",
+  "lab_test_comments",
   "sb_customresult",
   "custom_result",
   "medical_coding_section",
@@ -202,12 +206,12 @@
    "search_index": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "status",
    "fieldtype": "Select",
-   "in_list_view": 1,
+   "hidden": 1,
    "label": "Status",
-   "options": "Draft\nCompleted\nApproved\nRejected\nCancelled",
-   "read_only": 1,
+   "options": "Draft\nCollection\nCompleted\nApproved\nRejected\nCancelled",
    "search_index": 1
   },
   {
@@ -391,24 +395,17 @@
    "label": "Comments"
   },
   {
-   "fieldname": "lab_test_comment",
-   "fieldtype": "Text",
-   "ignore_xss_filter": 1,
-   "label": "Comments",
-   "print_hide": 1
-  },
-  {
    "collapsible": 1,
    "fieldname": "sb_customresult",
    "fieldtype": "Section Break",
    "label": "Custom Result"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "custom_result",
    "fieldtype": "Text Editor",
    "ignore_xss_filter": 1,
-   "label": "Custom Result",
-   "print_hide": 1
+   "label": "Custom Result"
   },
   {
    "default": "0",
@@ -586,7 +583,6 @@
    "fieldname": "time",
    "fieldtype": "Time",
    "in_list_view": 1,
-   "in_standard_filter": 1,
    "label": "Time"
   },
   {
@@ -623,6 +619,44 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fetch_from": "patient.uid",
+   "fieldname": "uid",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "UID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "lab_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Lab Status",
+   "options": "Draft\nCollection\nDispatch\nAcknowledge\nAcknowledge Outsource\nResult Entry\nResult Verification\nCompleted\nApproved\nRejected\nCancelled",
+   "search_index": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "patient_encounter",
+   "fieldtype": "Link",
+   "label": "Patient Encounter",
+   "options": "Patient Encounter"
+  },
+  {
+   "fieldname": "specimen",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "in_standard_filter": 1,
+   "label": "Specimen"
+  },
+  {
+   "fieldname": "lab_test_comments",
+   "fieldtype": "Text",
+   "ignore_xss_filter": 1,
+   "label": "Comments"
   }
  ],
  "is_submittable": 1,
@@ -630,9 +664,14 @@
   {
    "link_doctype": "Nursing Task",
    "link_fieldname": "reference_name"
+  },
+  {
+   "link_doctype": "Sample Collection",
+   "link_fieldname": "specimen",
+   "table_fieldname": "observation_sample_collection"
   }
  ],
- "modified": "2023-06-21 00:31:52.282467",
+ "modified": "2025-05-21 12:46:46.760064",
  "modified_by": "Administrator",
  "module": "Healthcare",
  "name": "Lab Test",
@@ -688,11 +727,20 @@
   }
  ],
  "restrict_to_domain": "Healthcare",
- "search_fields": "patient,practitioner,lab_test_name,sample",
+ "search_fields": "patient,practitioner,lab_test_name,sample,uid",
  "show_name_in_global_search": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": [],
+ "states": [
+  {
+   "color": "Blue",
+   "title": "Acknowledge"
+  },
+  {
+   "color": "Yellow",
+   "title": "Result Entry"
+  }
+ ],
  "title_field": "patient",
  "track_changes": 1,
  "track_seen": 1

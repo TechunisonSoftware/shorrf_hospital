@@ -9,11 +9,13 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "company",
   "observation",
   "observation_category",
   "preferred_display_name",
   "abbr",
   "has_component",
+  "lab_test",
   "column_break_zeln",
   "medical_department",
   "description",
@@ -396,11 +398,23 @@
    "fieldtype": "Link",
    "label": "Staff Role",
    "options": "Role"
+  },
+  {
+   "fieldname": "lab_test",
+   "fieldtype": "Link",
+   "label": "Lab Test",
+   "options": "Lab Test Template"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Centre",
+   "options": "Company"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-12-06 14:40:08.511353",
+ "modified": "2025-05-02 11:50:27.928160",
  "modified_by": "Administrator",
  "module": "Healthcare",
  "name": "Observation Template",

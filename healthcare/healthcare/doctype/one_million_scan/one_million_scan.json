@@ -1,0 +1,819 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2025-03-16 13:58:26.552257",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "general_details_section",
+  "naming_series",
+  "patient",
+  "phone",
+  "panchayat",
+  "village_and_distance_from_avt_camp",
+  "approx_monthly_income",
+  "electricity",
+  "column_break_tfte",
+  "age",
+  "aadhar_number",
+  "district",
+  "education",
+  "house_type",
+  "date",
+  "column_break_fmnu",
+  "gender",
+  "marital_status",
+  "state",
+  "occupation",
+  "source_of_drinking_water",
+  "family_details_section",
+  "family_details",
+  "particulars_and_remarks_tab",
+  "name_category_and_distance_to_nearest_health_facility",
+  "column_break_ujaa",
+  "name_and_distance_to_nearest_district_hosipital",
+  "health_insurance_coverage_section",
+  "has_insurance",
+  "no_insurance",
+  "type",
+  "in_previous_illness_episode_healthcare_sought_from_section",
+  "sub_centre",
+  "private_doctorclinic",
+  "local_medical_stores",
+  "column_break_ksgn",
+  "phc",
+  "local_ngo",
+  "not_applicable_previous_illness",
+  "column_break_dril",
+  "district_hospital",
+  "traditional_healersquacks",
+  "did_not_go_for_any_treatment",
+  "main_problem_faced_from_previous_healthcare_provider_section",
+  "high_consultation_fees",
+  "doctor_not_available",
+  "not_applicable_healthcare_provider",
+  "column_break_jpfv",
+  "high_medicine_cost",
+  "medicines_stock_out",
+  "others",
+  "column_break_uefh",
+  "long_waiting_period",
+  "travel_distance_is_more",
+  "others_notes",
+  "direct_out_of_pocket_expenditure_on_healthcare_section",
+  "medicine",
+  "column_break_dazo",
+  "opd_charges",
+  "column_break_gaar",
+  "ward_charges",
+  "column_break_ypwp",
+  "ot_charges",
+  "indirect_out_of_pocket_expenditure_on_healthcare_section",
+  "travel_charges",
+  "column_break_nazv",
+  "food",
+  "column_break_lunn",
+  "loss_of_wages",
+  "column_break_yayw",
+  "attenders__cost",
+  "risk_assessment_tab",
+  "habit_and_lifestyle_section",
+  "height",
+  "column_break_lmow",
+  "weight",
+  "column_break_kiur",
+  "bmi",
+  "section_break_ooho",
+  "do_you_do_any_physical_activity_for_at_least_20_minutes_a_day_",
+  "how_often_do_you_consume_alcohol",
+  "how_often_do_you_smoke_any_tobacco_products",
+  "do_you_chew_tobaccoaracanut_products",
+  "personal_history_section",
+  "do_you_have_past_history_of_cancer",
+  "does_anyone_in_your_family_havehad_cancer",
+  "do_you_have_diabetes_",
+  "do_you_have_high_blood_pressure_",
+  "have_you_sufferedsuffering_from_any_heart_disease_",
+  "do_you_have_family_history_of_diabeteshypertensionheart_disease",
+  "oral_cancer_questionnaire_section",
+  "ulcers_growth_mouth_3_weeks",
+  "do_you_have_white_or_red_patches_in_your_mouth_",
+  "do_you_find_it_difficult_to_eat_spicy_food_",
+  "do_you_have_any_difficulty_in_swallowing_",
+  "have_you_observed_any_persistent_change_in_voice_",
+  "do_you_have_any_swelling_in_the_neck_",
+  "lung_cancer_section",
+  "do_you_have_cough_lasting_for_more_than_3_weeks_",
+  "have_you_noticed_any_blood_in_sputum_spit_or_cough_",
+  "have_you_experienced_any_difficulty_in_breathing_",
+  "colon_cancer_questionnaire_section",
+  "have_you_noticed_any_blood_in_the_stool_",
+  "have_you_ever_had_any_polyps_removed_from_the_colon_",
+  "loose_stools_constipation",
+  "females_risk_assessment_tab",
+  "only_for_females",
+  "cervical_cancer_questionnaire_section",
+  "post_menopausal_bleeding",
+  "breast_cancer_questionnaire_section",
+  "first_period_age",
+  "age_at_first_childbirth",
+  "has_reached_menopause",
+  "if_yes_at_what_age",
+  "did_you_breast_feed_your_child_",
+  "oral_contraceptive_or_hrt_use",
+  "breast_or_armpit_lump",
+  "nipple_blood_discharge",
+  "breast_ulcer_or_texture_change",
+  "nipple_skin_changes",
+  "breast_biopsy_or_tests"
+ ],
+ "fields": [
+  {
+   "fetch_from": "patient.patient_age",
+   "fieldname": "age",
+   "fieldtype": "Data",
+   "label": "Age"
+  },
+  {
+   "fetch_from": "patient.sex",
+   "fieldname": "gender",
+   "fieldtype": "Data",
+   "label": "Gender"
+  },
+  {
+   "fieldname": "general_details_section",
+   "fieldtype": "Section Break",
+   "label": "General Details"
+  },
+  {
+   "fieldname": "village_and_distance_from_avt_camp",
+   "fieldtype": "Data",
+   "label": "Village and Distance from AVT Camp"
+  },
+  {
+   "fieldname": "column_break_tfte",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "panchayat",
+   "fieldtype": "Data",
+   "label": "Panchayat"
+  },
+  {
+   "fieldname": "column_break_fmnu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "district",
+   "fieldtype": "Data",
+   "label": "District"
+  },
+  {
+   "fieldname": "state",
+   "fieldtype": "Data",
+   "label": "State"
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date"
+  },
+  {
+   "fetch_from": "patient.marital_status",
+   "fieldname": "marital_status",
+   "fieldtype": "Data",
+   "label": "Marital Status"
+  },
+  {
+   "fetch_from": "patient.mobile",
+   "fieldname": "phone",
+   "fieldtype": "Data",
+   "label": "Phone "
+  },
+  {
+   "fetch_from": "patient.occupation",
+   "fieldname": "occupation",
+   "fieldtype": "Data",
+   "label": "Occupation"
+  },
+  {
+   "fieldname": "source_of_drinking_water",
+   "fieldtype": "Data",
+   "label": "Source of Drinking Water"
+  },
+  {
+   "fetch_from": "patient.aadhar_number",
+   "fieldname": "aadhar_number",
+   "fieldtype": "Data",
+   "label": "Aadhar Number"
+  },
+  {
+   "fieldname": "approx_monthly_income",
+   "fieldtype": "Data",
+   "label": "Approx Monthly Income"
+  },
+  {
+   "fieldname": "electricity",
+   "fieldtype": "Select",
+   "label": "Electricity",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "education",
+   "fieldtype": "Data",
+   "label": "Education"
+  },
+  {
+   "fieldname": "house_type",
+   "fieldtype": "Link",
+   "label": "House Type",
+   "options": "House Type"
+  },
+  {
+   "fieldname": "family_details_section",
+   "fieldtype": "Section Break",
+   "label": "Family Details"
+  },
+  {
+   "fieldname": "family_details",
+   "fieldtype": "Table",
+   "label": "Family Details",
+   "options": "Family Members"
+  },
+  {
+   "fieldname": "particulars_and_remarks_tab",
+   "fieldtype": "Tab Break",
+   "label": "Particulars and Remarks"
+  },
+  {
+   "fieldname": "name_category_and_distance_to_nearest_health_facility",
+   "fieldtype": "Data",
+   "label": "Name, Category and Distance to nearest Health Facility"
+  },
+  {
+   "fieldname": "column_break_ujaa",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "name_and_distance_to_nearest_district_hosipital",
+   "fieldtype": "Data",
+   "label": "Name and Distance to Nearest District Hospital"
+  },
+  {
+   "fieldname": "health_insurance_coverage_section",
+   "fieldtype": "Section Break",
+   "label": "Health Insurance"
+  },
+  {
+   "fieldname": "type",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Type"
+  },
+  {
+   "fieldname": "in_previous_illness_episode_healthcare_sought_from_section",
+   "fieldtype": "Section Break",
+   "label": "In Previous illness episode, healthcare sought from"
+  },
+  {
+   "default": "0",
+   "fieldname": "sub_centre",
+   "fieldtype": "Check",
+   "label": "Sub Centre"
+  },
+  {
+   "default": "0",
+   "fieldname": "phc",
+   "fieldtype": "Check",
+   "label": "PHC"
+  },
+  {
+   "default": "0",
+   "fieldname": "district_hospital",
+   "fieldtype": "Check",
+   "label": "District Hospital"
+  },
+  {
+   "default": "0",
+   "fieldname": "private_doctorclinic",
+   "fieldtype": "Check",
+   "label": "Private Doctor/Clinic"
+  },
+  {
+   "default": "0",
+   "fieldname": "local_ngo",
+   "fieldtype": "Check",
+   "label": "Local NGO"
+  },
+  {
+   "default": "0",
+   "fieldname": "traditional_healersquacks",
+   "fieldtype": "Check",
+   "label": "Traditional Healers/quacks"
+  },
+  {
+   "default": "0",
+   "fieldname": "local_medical_stores",
+   "fieldtype": "Check",
+   "label": "Local Medical Stores"
+  },
+  {
+   "default": "0",
+   "fieldname": "did_not_go_for_any_treatment",
+   "fieldtype": "Check",
+   "label": "Did not go for any treatment"
+  },
+  {
+   "fieldname": "column_break_ksgn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_dril",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "not_applicable_previous_illness",
+   "fieldtype": "Check",
+   "label": "Not Applicable"
+  },
+  {
+   "fieldname": "main_problem_faced_from_previous_healthcare_provider_section",
+   "fieldtype": "Section Break",
+   "label": "Main problem faced from previous healthcare provider"
+  },
+  {
+   "default": "0",
+   "fieldname": "high_consultation_fees",
+   "fieldtype": "Check",
+   "label": "High Consultation Fees"
+  },
+  {
+   "default": "0",
+   "fieldname": "doctor_not_available",
+   "fieldtype": "Check",
+   "label": "Doctor Not Available"
+  },
+  {
+   "default": "0",
+   "fieldname": "not_applicable_healthcare_provider",
+   "fieldtype": "Check",
+   "label": "Not Applicable"
+  },
+  {
+   "fieldname": "column_break_jpfv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "high_medicine_cost",
+   "fieldtype": "Check",
+   "label": "High Medicine Cost"
+  },
+  {
+   "default": "0",
+   "fieldname": "medicines_stock_out",
+   "fieldtype": "Check",
+   "label": "Medicines Stock Out"
+  },
+  {
+   "default": "0",
+   "fieldname": "others",
+   "fieldtype": "Check",
+   "label": "Others"
+  },
+  {
+   "fieldname": "column_break_uefh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "long_waiting_period",
+   "fieldtype": "Check",
+   "label": "Long Waiting Period"
+  },
+  {
+   "default": "0",
+   "fieldname": "travel_distance_is_more",
+   "fieldtype": "Check",
+   "label": "Travel Distance is More"
+  },
+  {
+   "fieldname": "direct_out_of_pocket_expenditure_on_healthcare_section",
+   "fieldtype": "Section Break",
+   "label": "Direct Out of Pocket Expenditure on Healthcare"
+  },
+  {
+   "fieldname": "medicine",
+   "fieldtype": "Data",
+   "label": "Medicine "
+  },
+  {
+   "fieldname": "column_break_dazo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "opd_charges",
+   "fieldtype": "Data",
+   "label": "OPD Charges"
+  },
+  {
+   "fieldname": "column_break_gaar",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ward_charges",
+   "fieldtype": "Data",
+   "label": "Ward Charges"
+  },
+  {
+   "fieldname": "column_break_ypwp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ot_charges",
+   "fieldtype": "Data",
+   "label": "OT Charges"
+  },
+  {
+   "fieldname": "indirect_out_of_pocket_expenditure_on_healthcare_section",
+   "fieldtype": "Section Break",
+   "label": "Indirect Out of Pocket Expenditure on Healthcare"
+  },
+  {
+   "fieldname": "travel_charges",
+   "fieldtype": "Data",
+   "label": "Travel Charges"
+  },
+  {
+   "fieldname": "column_break_nazv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "food",
+   "fieldtype": "Data",
+   "label": "Food"
+  },
+  {
+   "fieldname": "column_break_lunn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "loss_of_wages",
+   "fieldtype": "Data",
+   "label": "Loss of Wages"
+  },
+  {
+   "fieldname": "column_break_yayw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "attenders__cost",
+   "fieldtype": "Data",
+   "label": "Attenders  Cost"
+  },
+  {
+   "fieldname": "risk_assessment_tab",
+   "fieldtype": "Tab Break",
+   "label": "Risk Assessment"
+  },
+  {
+   "fieldname": "habit_and_lifestyle_section",
+   "fieldtype": "Section Break",
+   "label": "Habit and Lifestyle"
+  },
+  {
+   "fieldname": "column_break_lmow",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_kiur",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "bmi",
+   "fieldtype": "Float",
+   "label": "BMI",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_ooho",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "how_often_do_you_consume_alcohol",
+   "fieldtype": "Select",
+   "label": "How often do you consume alcohol ?",
+   "options": "\nNever\nOccasional\nDaily"
+  },
+  {
+   "fieldname": "how_often_do_you_smoke_any_tobacco_products",
+   "fieldtype": "Select",
+   "label": "How often do you smoke any tobacco products ?",
+   "options": "\nNever\nOccasional\nDaily"
+  },
+  {
+   "fieldname": "do_you_chew_tobaccoaracanut_products",
+   "fieldtype": "Select",
+   "label": "Do you chew tobacco/aracanut products ?",
+   "options": "\nNever\nOccasional\nDaily"
+  },
+  {
+   "fieldname": "personal_history_section",
+   "fieldtype": "Section Break",
+   "label": "Personal History"
+  },
+  {
+   "fieldname": "do_you_have_past_history_of_cancer",
+   "fieldtype": "Select",
+   "label": "Do you have past history of cancer ?",
+   "options": "\nYes\nNo\nDon't Know"
+  },
+  {
+   "fieldname": "does_anyone_in_your_family_havehad_cancer",
+   "fieldtype": "Select",
+   "label": "Does anyone in your family have/had cancer ?",
+   "options": "\nNone\nOne\nMore than one\nUnknown"
+  },
+  {
+   "fieldname": "do_you_have_diabetes_",
+   "fieldtype": "Select",
+   "label": "Do you have Diabetes ?",
+   "options": "\nYes\nNo\nDon't Know"
+  },
+  {
+   "fieldname": "do_you_have_high_blood_pressure_",
+   "fieldtype": "Select",
+   "label": "Do you have high blood pressure ?",
+   "options": "\nYes\nNo\nDon't Know"
+  },
+  {
+   "fieldname": "have_you_sufferedsuffering_from_any_heart_disease_",
+   "fieldtype": "Select",
+   "label": "Have you suffered/suffering from any heart disease ?",
+   "options": "\nYes\nNo\nDon't Know"
+  },
+  {
+   "fieldname": "do_you_have_family_history_of_diabeteshypertensionheart_disease",
+   "fieldtype": "Select",
+   "label": "Do you have a family history of any of the following: diabetes, hypertension, or heart disease ?",
+   "options": "\nYes\nNo\nDon't Know"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "oral_cancer_questionnaire_section",
+   "fieldtype": "Section Break",
+   "label": "Oral Cancer Questionnaire"
+  },
+  {
+   "fieldname": "ulcers_growth_mouth_3_weeks",
+   "fieldtype": "Select",
+   "label": "Do you get any ulcers or growth in mouth lasting more than 3 Weeks ?",
+   "options": "\nYes\nNo\nDon't Know"
+  },
+  {
+   "fieldname": "do_you_have_white_or_red_patches_in_your_mouth_",
+   "fieldtype": "Select",
+   "label": "Do you have white or red patches in your mouth ? ",
+   "options": "\nYes\nNo\nDon't Know"
+  },
+  {
+   "fieldname": "do_you_find_it_difficult_to_eat_spicy_food_",
+   "fieldtype": "Select",
+   "label": "Do you find it difficult to eat spicy food ?",
+   "options": "\nYes\nNo\nDon't Know"
+  },
+  {
+   "fieldname": "do_you_have_any_difficulty_in_swallowing_",
+   "fieldtype": "Select",
+   "label": "Do you have any Difficulty in swallowing ?",
+   "options": "\nYes\nNo\nDon't Know"
+  },
+  {
+   "fieldname": "have_you_observed_any_persistent_change_in_voice_",
+   "fieldtype": "Select",
+   "label": "Have you observed any persistent change in voice ?",
+   "options": "\nYes\nNo\nDon't Know"
+  },
+  {
+   "fieldname": "do_you_have_any_swelling_in_the_neck_",
+   "fieldtype": "Select",
+   "label": "Do you have any swelling in the neck ?",
+   "options": "\nYes\nNo\nDon't Know"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "lung_cancer_section",
+   "fieldtype": "Section Break",
+   "label": "Lung Cancer"
+  },
+  {
+   "fieldname": "do_you_have_cough_lasting_for_more_than_3_weeks_",
+   "fieldtype": "Select",
+   "label": "Do you have cough lasting for more than 3 weeks ?",
+   "options": "\nYes\nNo\nDon't Know"
+  },
+  {
+   "fieldname": "have_you_noticed_any_blood_in_sputum_spit_or_cough_",
+   "fieldtype": "Select",
+   "label": "Have you noticed any blood in sputum, spit or cough ?",
+   "options": "\nYes\nNo\nDon't Know"
+  },
+  {
+   "fieldname": "have_you_experienced_any_difficulty_in_breathing_",
+   "fieldtype": "Select",
+   "label": "Have you experienced any difficulty in breathing ?",
+   "options": "\nYes\nNo\nDon't Know"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "colon_cancer_questionnaire_section",
+   "fieldtype": "Section Break",
+   "label": "Colon Cancer Questionnaire"
+  },
+  {
+   "fieldname": "have_you_noticed_any_blood_in_the_stool_",
+   "fieldtype": "Select",
+   "label": "Have you noticed any blood in the stool ?",
+   "options": "\nYes\nNo\nDon't Know"
+  },
+  {
+   "fieldname": "loose_stools_constipation",
+   "fieldtype": "Select",
+   "label": "Have you experienced any recent changes in bowel habits ?(loose stools or constipation)",
+   "options": "\nYes\nNo\nDon't Know"
+  },
+  {
+   "fieldname": "have_you_ever_had_any_polyps_removed_from_the_colon_",
+   "fieldtype": "Select",
+   "label": "Have you ever had any polyps removed from the colon ?",
+   "options": "\nYes\nNo\nDon't Know"
+  },
+  {
+   "fieldname": "do_you_do_any_physical_activity_for_at_least_20_minutes_a_day_",
+   "fieldtype": "Select",
+   "label": "Do you do any physical activity for at least 20 minutes a day ?",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "females_risk_assessment_tab",
+   "fieldtype": "Tab Break",
+   "label": "Female's Risk Assessment"
+  },
+  {
+   "fieldname": "only_for_females",
+   "fieldtype": "Heading",
+   "label": "Only For Females"
+  },
+  {
+   "fieldname": "cervical_cancer_questionnaire_section",
+   "fieldtype": "Section Break",
+   "label": "Cervical Cancer Questionnaire"
+  },
+  {
+   "fieldname": "post_menopausal_bleeding",
+   "fieldtype": "Select",
+   "label": "Have you experienced any post menopausal bleeding (Bleeding once your menses end) or into menstrualbleeding or bleeding after intercourse ? ",
+   "options": "\nYes\nNo\nDon't Know"
+  },
+  {
+   "fieldname": "breast_cancer_questionnaire_section",
+   "fieldtype": "Section Break",
+   "label": "Breast Cancer Questionnaire"
+  },
+  {
+   "fieldname": "first_period_age",
+   "fieldtype": "Select",
+   "label": "What was your age when you had your first menstrual cycle (first period) ?",
+   "options": "\n7-11\n12-14\n15 or older"
+  },
+  {
+   "fieldname": "age_at_first_childbirth",
+   "fieldtype": "Select",
+   "label": "At what age did you have your first child ?",
+   "options": "\nNone\n<20\n20-24\n25-29\n>30"
+  },
+  {
+   "fieldname": "has_reached_menopause",
+   "fieldtype": "Select",
+   "label": "Have you reach your menopause ? (time that marks end of your periods or menses)",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "did_you_breast_feed_your_child_",
+   "fieldtype": "Select",
+   "label": "Did you breast feed your child ?",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "oral_contraceptive_or_hrt_use",
+   "fieldtype": "Select",
+   "label": "Have you use oral contraceptive pills/Hormone Replacement therapy ?",
+   "options": "\nNo\nLess than 5 years\nMore than 5 years"
+  },
+  {
+   "fieldname": "breast_or_armpit_lump",
+   "fieldtype": "Select",
+   "label": "Do you feel any lump in your breast or armpit ?",
+   "options": "\nYes\nNo\nDon't Know"
+  },
+  {
+   "fieldname": "nipple_blood_discharge",
+   "fieldtype": "Select",
+   "label": "Have you noticed any blood stained discharge from the nipple ?",
+   "options": "\nYes\nNo\nDon't Know"
+  },
+  {
+   "fieldname": "breast_ulcer_or_texture_change",
+   "fieldtype": "Select",
+   "label": "Have you noticed any change in skin texture/ulcer over breast ?",
+   "options": "\nYes\nNo\nDon't Know"
+  },
+  {
+   "fieldname": "nipple_skin_changes",
+   "fieldtype": "Select",
+   "label": "Have you noticed any scratch of the skin around the nipple or inward turn of the nipple ?",
+   "options": "\nYes\nNo\nDon't Know"
+  },
+  {
+   "fieldname": "breast_biopsy_or_tests",
+   "fieldtype": "Select",
+   "label": "Have you had biopsy or tests for breast lumps or discharge ?",
+   "options": "\nYes\nNo\nDon't Know"
+  },
+  {
+   "fieldname": "height",
+   "fieldtype": "Float",
+   "label": "Height (In Meter)"
+  },
+  {
+   "fieldname": "weight",
+   "fieldtype": "Float",
+   "label": "Weight (In Kilogram)"
+  },
+  {
+   "fieldname": "if_yes_at_what_age",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "If yes, at what age ?  ",
+   "options": "\n50 years or younger\n51 - 55 years\n56 years or more"
+  },
+  {
+   "fieldname": "patient",
+   "fieldtype": "Link",
+   "label": "Name",
+   "options": "Patient"
+  },
+  {
+   "default": "0",
+   "fieldname": "has_insurance",
+   "fieldtype": "Check",
+   "label": "Has Insurance"
+  },
+  {
+   "default": "0",
+   "fieldname": "no_insurance",
+   "fieldtype": "Check",
+   "label": "No Insurance"
+  },
+  {
+   "fieldname": "others_notes",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Others Notes"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Series",
+   "options": "HLC-OMS-.YYYY.-"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-03-28 10:50:10.736155",
+ "modified_by": "Administrator",
+ "module": "Healthcare",
+ "name": "One Million Scan",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

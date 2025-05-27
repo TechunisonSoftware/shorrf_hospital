@@ -60,11 +60,6 @@ class PatientAppointment(Document):
 		send_confirmation_msg(self)
 		self.insert_calendar_event()
 
-		if self.service_request:
-			frappe.db.set_value(
-				"Service Request", self.service_request, "status", "completed-Request Status"
-			)
-
 	def set_title(self):
 		if self.practitioner:
 			self.title = _("{0} with {1}").format(
@@ -81,14 +76,15 @@ class PatientAppointment(Document):
 
 		# If appointment is created for today set status as Open else Scheduled
 		if appointment_date == today:
-			if self.status not in ["Checked In", "Checked Out", "Open", "Confirmed"]:
+			if self.status not in ["Checked In", "Checked Out"]:
 				self.status = "Open"
 
-		elif appointment_date > today and self.status not in ["Scheduled", "Confirmed"]:
+		elif appointment_date > today:
 			self.status = "Scheduled"
 
-		elif appointment_date < today and self.status != "No Show":
-			self.status = "No Show"
+		elif appointment_date < today:
+			if self.status == "Scheduled":
+				self.status = "No Show"
 
 	def validate_overlaps(self):
 		if self.appointment_based_on_check_in:
@@ -352,6 +348,7 @@ class PatientAppointment(Document):
 				event_doc.starts_on = starts_on
 				event_doc.ends_on = ends_on
 				event_doc.add_video_conferencing = self.add_video_conferencing
+				event_doc.save()
 				event_doc.save(ignore_permissions=True)
 				event_doc.reload()
 				self.google_meet_link = event_doc.google_meet_link
@@ -513,11 +510,6 @@ def get_appointment_item(appointment_doc, item):
 
 def cancel_appointment(appointment_id):
 	appointment = frappe.get_doc("Patient Appointment", appointment_id)
-	if appointment.service_request:
-		frappe.db.set_value(
-			"Service Request", appointment.service_request, "status", "active-Request Status"
-		)
-
 	if appointment.invoiced:
 		sales_invoice = check_sales_invoice_exists(appointment)
 		if sales_invoice and cancel_sales_invoice(sales_invoice):
@@ -905,10 +897,20 @@ def get_prescribed_therapies(patient):
 def update_appointment_status():
 	# update the status of appointments daily
 	appointments = frappe.get_all(
-		"Patient Appointment", {"status": ("not in", ["Closed", "Cancelled", "Confirmed"])}
+		"Patient Appointment", {"status": ("not in", ["Closed", "Cancelled"])}
 	)
 
 	for appointment in appointments:
 		appointment_doc = frappe.get_doc("Patient Appointment", appointment.name)
 		appointment_doc.set_status()
 		appointment_doc.save()
+
+
+@frappe.whitelist()
+def get_practitioner_department(practitioner):
+	"""Get department of practitioner"""
+	if practitioner:
+		department = frappe.db.get_value("Healthcare Practitioner", practitioner, "department")
+		return department
+	else:
+		return None

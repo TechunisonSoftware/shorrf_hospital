@@ -15,6 +15,10 @@ from healthcare.healthcare.utils import get_medical_codes
 
 
 class PatientEncounter(Document):
+	# def before_save(self):
+	# 	print("Caaling before save")
+	# 	self.make_service_request()
+		
 	def validate(self):
 		self.set_title()
 		self.validate_medications()
@@ -33,8 +37,9 @@ class PatientEncounter(Document):
 	def on_submit(self):
 		if self.therapies:
 			create_therapy_plan(self)
-		self.make_service_request()
+		# self.make_service_request()
 		self.make_medication_request()
+
 		# to save service_request name in prescription
 		self.save("Update")
 		self.db_set("status", "Completed")
@@ -158,7 +163,7 @@ class PatientEncounter(Document):
 			return
 
 		for therapy in self.therapies:
-			if not therapy.no_of_sessions or therapy.no_of_sessions <= 0:
+			if therapy.no_of_sessions <= 0:
 				frappe.throw(
 					_("Row #{0} (Therapies): Number of Sessions should be at least 1").format(therapy.idx)
 				)
@@ -192,6 +197,19 @@ class PatientEncounter(Document):
 					order.insert(ignore_permissions=True, ignore_mandatory=True)
 					order.submit()
 					lab_test.service_request = order.name
+		if self.radiology:			
+			for radiology in self.radiology:				
+				if radiology.observation_template:
+					template_doc = "Observation Template"
+					template = "observation_template"
+				else:
+					continue
+				if not radiology.service_request:
+					observation_template = frappe.get_doc(template_doc,radiology.get(template))
+					order = self.get_order_details(observation_template,radiology)
+					order.insert(ignore_permissions=True,ignore_mandatory=True)
+					order.submit()
+					radiology.service_request = order.name 			
 
 		if self.procedure_prescription:
 			for procedure in self.procedure_prescription:
@@ -478,24 +496,19 @@ def create_medication_request(encounter):
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
 def get_medications_query(doctype, txt, searchfield, start, page_len, filters):
-	medication_name = filters.get("medication")
-
+	medication_name = filters.get("name")
 	medication_child = frappe.qb.DocType("Medication Linked Item")
 	medication = frappe.qb.DocType("Medication")
 	item = frappe.qb.DocType("Item")
-	query = (
+	data = (
 		frappe.qb.select(medication_child.brand, medication_child.manufacturer, medication_child.item)
 		.from_(medication_child)
 		.left_join(medication)
 		.on(medication.name == medication_child.parent)
 		.left_join(item)
 		.on(item.name == medication_child.item)
-		.where(item.disabled == 0)
-	)
-	if medication_name:
-		query = query.where(medication.name == medication_name)
-
-	data = query.run(as_dict=True)
+		.where((medication.name == medication_name) & (item.disabled == 0))
+	).run(as_dict=True)
 	data_list = []
 	for d in data:
 		display_list = []
@@ -508,9 +521,9 @@ def get_medications_query(doctype, txt, searchfield, start, page_len, filters):
 		default_warehouse = frappe.get_cached_value("Stock Settings", None, "default_warehouse")
 		if default_warehouse:
 			actual_qty = frappe.db.get_value(
-				"Bin", {"warehouse": default_warehouse, "item_code": d.get("item")}, "actual_qty"
+				"Bin", {"warehouse": default_warehouse, "item_code": d.get("name")}, "actual_qty"
 			)
-			display_list.append("<br>Actual Qty : " + (str(actual_qty) if actual_qty else "0"))
+			display_list.append("Qty:" + str(actual_qty) if actual_qty else "0")
 		data_list.append(display_list)
 	res = tuple(tuple(sub) for sub in data_list)
 	return res
@@ -541,30 +554,61 @@ def create_service_request_from_widget(encounter, data, medication_request=False
 	order.submit()
 
 
-@frappe.whitelist()
-def create_patient_referral(encounter, references):
-	if isinstance(references, str):
-		references = json.loads(references)
 
-	encounter_doc = frappe.get_doc("Patient Encounter", encounter)
-	for ref in references:
-		order = frappe.get_doc(
-			{
-				"doctype": "Service Request",
-				"order_date": encounter_doc.get("encounter_date"),
-				"order_time": encounter_doc.get("encounter_time"),
-				"company": encounter_doc.get("company"),
-				"status": "draft-Request Status",
-				"source_doc": "Patient Encounter",
-				"order_group": encounter,
-				"patient": encounter_doc.get("patient"),
-				"practitioner": encounter_doc.get("practitioner"),
-				"template_dt": "Appointment Type",
-				"template_dn": ref.get("appointment_type"),
-				"quantity": 1,
-				"order_description": ref.get("referral_note"),
-				"referred_to_practitioner": ref.get("refer_to"),
-			}
-		)
-		order.insert(ignore_permissions=True, ignore_mandatory=True)
-		order.submit()
+
+
+
+
+def on_submit(doc, method):
+	# Check if the drug_prescription table has any rows
+    if not doc.drug_prescription:
+        # Do nothing if no rows are present in the drug_prescription table
+        return
+
+    # Check if a Pharmacy record already exists for this Patient Encounter
+    existing_pharmacy = frappe.get_all(
+        "Pharmacy Prescription",
+        filters={"patient_encounter": doc.name},
+        limit=1
+    )
+   
+    if not existing_pharmacy:
+        # Create a new Pharmacy record
+        pharmacy_doc = frappe.get_doc({
+            "doctype": "Pharmacy Prescription",
+            "patient_encounter": doc.name,  # Link to Patient Encounter
+            "patient": doc.patient,        # Map the patient field
+            "patient_name": doc.patient_name,
+            "gender": doc.patient_sex,
+            "age": doc.patient_age,               # Map age
+            "encounter_date": doc.encounter_date, # Map encounter date
+            "encounter_time": doc.encounter_time, # Map encounter time
+            "healthcare_practitioner": doc.practitioner, # Map healthcare practitioner
+            "practitioner_name": doc.practitioner_name,  # Map practitioner name
+            "department": doc.medical_department,
+			"company": doc.company,
+			"status":"Booked"
+        })
+        
+        # Append drug prescription details
+        for drug in doc.drug_prescription:
+            pharmacy_doc.append("drug_prescription", {
+                "medication": drug.medication,          # Map medication
+                "drug_code": drug.drug_code,            # Map drug code
+                "dosage": drug.dosage,                  # Map dosage
+                "period": drug.period,                  # Map period
+                "dosage_form": drug.dosage_form,
+				"comment": drug.comment,
+                "medication_status":"Booked"
+            })
+
+        # Save the Pharmacy record
+        pharmacy_doc.insert(ignore_permissions=True)
+        frappe.db.commit()
+
+@frappe.whitelist()
+def get_schedule_procedures(radiology):
+    schedule_procedure = frappe.get_doc('Schedule Procedures',{'name':radiology})
+    child_schedule_procedure = schedule_procedure.get('schedule_procedure')
+    procedure_names = [child.get('procedure_name') for child in child_schedule_procedure if child.get('procedure_name')]
+    return procedure_names

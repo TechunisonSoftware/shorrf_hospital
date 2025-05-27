@@ -3,6 +3,13 @@
 
 frappe.ui.form.on('Patient Encounter', {
 	onload: function(frm) {
+		 frappe.after_ajax(() => {
+			// console.log('Patient Encounter Form Loaded');
+			
+            if (frm.is_new() && (frm.doc.patient && frm.doc.practitioner)) {
+                frm.save();
+            }
+        });
 		if (!frm.doc.__islocal && frm.doc.docstatus === 1 &&
 			frm.doc.inpatient_status == 'Admission Scheduled') {
 				frappe.db.get_value('Inpatient Record', frm.doc.inpatient_record,
@@ -24,9 +31,13 @@ frappe.ui.form.on('Patient Encounter', {
 		}
 		show_clinical_notes(frm);
 		show_orders(frm);
+		healthcare.utils.set_company_if_local(frm);
 	},
 
 	setup: function(frm) {
+
+	
+		
 		frm.get_field('therapies').grid.editable_fields = [
 			{fieldname: 'therapy_type', columns: 8},
 			{fieldname: 'no_of_sessions', columns: 2}
@@ -42,9 +53,33 @@ frappe.ui.form.on('Patient Encounter', {
 			frm.get_field('drug_prescription').grid.editable_fields.splice(0, 0, {fieldname: 'medication', columns: 3});
 			frm.get_field('drug_prescription').grid.editable_fields.splice(2, 1); // remove item description
 		}
+		frm.set_query("observation_template", "radiology", function (doc, cdt, cdn) {
+            let d = locals[cdt][cdn];
+			let service_center = frm.doc.company
+
+            // let selected_radiology = [];
+            // $.each(doc.radiology, function (i, row) {
+            //     if (row.observation_template) {
+            //         selected_radiology.push(row.observation_template)
+            //     }
+            // })
+            return {
+                filters: {
+                    // "account": d.account_name,
+                    "observation_category":"Imaging",
+					"company":service_center
+					// "name": ["Not In", selected_radiology]
+                },
+            }
+        });	
+
+
 	},
 
 	refresh: function(frm) {
+		
+		$('button[data-doctype="Clinical Note"]').show(); // Ensure it's visible
+		
 		refresh_field('drug_prescription');
 		refresh_field('lab_test_prescription');
 
@@ -57,9 +92,26 @@ frappe.ui.form.on('Patient Encounter', {
 				}
 			}
 
-			frm.add_custom_button(__("Refer Patient"), function() {
-				create_patient_referral(frm);
-			},__("Create"));
+			frm.add_custom_button(__('View DICOM'),function(){		
+				// console.log(frm.doc.uid);
+						
+				if(frm.doc.patient){
+					frappe.db.get_single_value('Radiology Setting', 'orthanc_url').then(orthanc_url => {	
+						// console.log(orthanc_url);
+																
+						if(orthanc_url){
+							window.open(`${orthanc_url}/ui/app/#/filtered-studies?PatientID=${frm.doc.uid}&order-by=Metadata,LastUpdate,DESC`)
+						}else{
+							frappe.msgprint({
+								title: __('Error'),
+								indicator: 'red',
+								message: __('Please configure the requesting URL on radiology setting.')
+							});
+						}						
+					});					
+					
+				}
+			})
 
 			frm.add_custom_button(__('Patient History'), function() {
 				if (frm.doc.patient) {
@@ -124,10 +176,24 @@ frappe.ui.form.on('Patient Encounter', {
 		}
 
 		frm.set_query('patient', function() {
-			return {
-				filters: {'status': 'Active'}
-			};
+			if (frm.doc.company) {
+				return {
+					filters: { 'status': 'Active' ,'company': frm.doc.company}
+				};
+			}else{
+				return {
+					filters: { 'status': 'Active' }
+				};
+			}
 		});
+
+		frm.set_query('practitioner', function() {
+			if (frm.doc.company) {
+				return {
+					filters: { 'company': frm.doc.company}		
+				}	
+			}
+		});		
 
 		frm.set_query('drug_code', 'drug_prescription', function() {
 			return {
@@ -137,12 +203,17 @@ frappe.ui.form.on('Patient Encounter', {
 			};
 		});
 
-		frm.set_query('lab_test_code', 'lab_test_prescription', function() {
+		frm.set_query('lab_test_code', 'lab_test_prescription', function(doc) {
+			console.log(doc.company);
+			let service_center = doc.company
 			return {
 				filters: {
-					is_billable: 1
+					is_billable: 1,
+					company:service_center
 				}
 			};
+			
+		
 		});
 
 		frm.set_query('appointment', function() {
@@ -168,7 +239,8 @@ frappe.ui.form.on('Patient Encounter', {
 		frm.set_query("medication", "drug_prescription", function() {
 			return {
 				filters: {
-					disabled: false
+					disabled: false,
+					company: frm.doc.company
 				}
 			};
 		})
@@ -185,14 +257,18 @@ frappe.ui.form.on('Patient Encounter', {
 		if (frappe.meta.get_docfield('Drug Prescription', 'medication').in_list_view === 1) {
 			frm.set_query('drug_code', 'drug_prescription', function(doc, cdt, cdn) {
 				let row = frappe.get_doc(cdt, cdn);
-				let filters = { is_stock_item: 1 };
 				if (row.medication) {
-					filters.medication = row.medication;
+					return {
+						query: 'healthcare.healthcare.doctype.patient_encounter.patient_encounter.get_medications_query',
+						filters: { name: row.medication }
+					};
+				} else {
+					return {
+						filters: {
+							is_stock_item: 1
+						}
+					};
 				}
-				return {
-					query: 'healthcare.healthcare.doctype.patient_encounter.patient_encounter.get_medications_query',
-					filters: filters
-				};
 			});
 		}
 		var table_list =  ["drug_prescription", "lab_test_prescription", "procedure_prescription", "therapies"]
@@ -203,14 +279,93 @@ frappe.ui.form.on('Patient Encounter', {
 	appointment: function(frm) {
 		frm.events.set_appointment_fields(frm);
 	},
+	provisional:function(frm) {
+		if(frm.doc.provisional){
+			frm.set_df_property('final', 'read_only', 1);
+		}else{
+			frm.set_df_property('final', 'read_only', 0);
+		}
+	},
+	final:function(frm) {
+		if(frm.doc.final){
+			frm.set_df_property('provisional', 'read_only', 1);
+		}else{
+			frm.set_df_property('provisional', 'read_only', 0);
+		}
+	},
+
+
 
 	patient: function(frm) {
 		frm.events.set_patient_info(frm);
+		if(frm.doc.practitioner){
+			frm.save()
+		}
+		if(frm.doc.patient){
+			frappe.db.get_value('Patient', frm.doc.patient, ['allergies', 'medical_history'])
+			.then(r => {
+				if (r.message) {		
+					
+					frm.set_value('allergies', r.message.allergies);
+					frm.set_value('medical_history', r.message.medical_history);
+				}
+			});
+           
+		}else{
+			frm.set_value('allergies', '');
+			frm.set_value('medical_history', '');
+
+		}
 	},
+	allergies:frappe.utils.debounce(function (frm) {		
+        if (frm.doc.allergies && frm.doc.patient) {
+            // console.log(`Updating allergies for patient: ${frm.doc.patient}`);
+            frappe.call({
+                method: "frappe.client.set_value",
+                args: {
+                    doctype: "Patient",
+                    name: frm.doc.patient,
+                    fieldname: "allergies",
+                    value: frm.doc.allergies
+                },
+                callback: function(response) {
+					console.log(response);
+					
+                }
+            });
+        }
+    }, 3000) ,
+
+	medical_history:frappe.utils.debounce(function (frm) {		
+        if (frm.doc.medical_history && frm.doc.patient) {
+            // console.log(`Updating allergies for patient: ${frm.doc.patient}`);
+            frappe.call({
+                method: "frappe.client.set_value",
+                args: {
+                    doctype: "Patient",
+                    name: frm.doc.patient,
+                    fieldname: "medical_history",
+                    value: frm.doc.medical_history
+                },
+                callback: function(response) {
+					console.log(response);					
+                    // if (response.message) {
+                    //     frappe.msgprint(__(`Medical History updated for "${frm.doc.patient}" successfully!`));
+                    // } else {
+                    //     frappe.msgprint(__(`Failed to update Medical History for "${frm.doc.patient}".`));
+                    // }
+                }
+            });
+        }
+    }, 3000) ,
 
 	practitioner: function(frm) {
 		if (!frm.doc.practitioner) {
 			frm.set_value('practitioner_name', '');
+
+		}
+		if(frm.doc.patient){
+			frm.save()
 		}
 	},
 	set_appointment_fields: function(frm) {
@@ -336,7 +491,7 @@ var schedule_inpatient = function(frm) {
 			{fieldtype: 'Link', label: 'Nursing Checklist Template', fieldname: 'admission_nursing_checklist_template', options: 'Nursing Checklist Template'},
 			{fieldtype: 'Column Break'},
 			{fieldtype: 'Date', label: 'Admission Ordered For', fieldname: 'admission_ordered_for', default: 'Today'},
-			{fieldtype: 'Link', label: 'Service Unit Type', fieldname: 'service_unit_type', options: 'Healthcare Service Unit Type'},
+			{fieldtype: 'Link', label: 'Service Unit Type', fieldname: 'service_unit_type', options: 'Healthcare Service Unit Type',default:'Inpatient Units'},
 			{fieldtype: 'Int', label: 'Expected Length of Stay', fieldname: 'expected_length_of_stay'},
 			{fieldtype: 'Section Break'},
 			{fieldtype: 'Long Text', label: 'Admission Instructions', fieldname: 'admission_instruction'}
@@ -534,10 +689,12 @@ let create_nursing_tasks = function(frm) {
 				}
 			});
 
-			d.hide();		frm.set_query('lab_test_code', 'lab_test_prescription', function() {
+			d.hide();		
+			frm.set_query('lab_test_code', 'lab_test_prescription', function(frm) {
 				return {
 					filters: {
-						is_billable: 1
+						is_billable: 1,
+						// company:frm.doc.company
 					}
 				};
 			});
@@ -708,75 +865,51 @@ var show_orders = async function(frm) {
 	}
 }
 
-let create_patient_referral = function(frm) {
-	var dialog = new frappe.ui.Dialog ({
-		title: "Patient Referral",
-		size: "large",
-		fields: [
-			{
-				label: "References",
-				fieldname: "references",
-				fieldtype: "Table",
-				is_editable_grid: true,
-				data: [],
-				fields: [
-					{
-						"fieldname": "refer_to",
-						"fieldtype": "Link",
-						"label": "Refer To",
-						"options": "Healthcare Practitioner",
-						"in_list_view": 1,
-						"reqd": 1,
-						get_query: function () {
-							return {
-								filters: {
-									name: ["!=", frm.doc.practitioner]
-								},
-							};
-						},
-					},
-					{
-						"fieldname": "appointment_type",
-						"fieldtype": "Link",
-						"label": "Appointment Type",
-						"options": "Appointment Type",
-						"in_list_view": 1,
-						"reqd": 1,
-					},
-					{
-						"fieldname": "referral_note",
-						"fieldtype": "Long Text",
-						"label": "Referral Note",
-						"in_list_view": 1,
-					},
-				],
-			},
-		],
-		primary_action_label: __("Refer"),
-		primary_action : function() {
-			if (dialog.get_value("references").length>0) {
-				frappe.call({
-					method: "healthcare.healthcare.doctype.patient_encounter.patient_encounter.create_patient_referral",
-					freeze: true,
-					args: {
-						encounter: frm.doc.name,
-						references: dialog.get_value("references"),
-					},
-					callback: function(r) {
-						if (r && !r.exc) {
-							dialog.hide();
-							frm.reload_doc();
-							frappe.show_alert({
-								message: __("Patient referral requests created successfully"),
-								indicator: "success"
-							});
-						}
-					}
-				});
-				frm.refresh_fields();
-			}
-		}
-	});
 
-	dialog.show();
-};
+frappe.ui.form.on('Radiology', {  
+    observation_template: function(frm, cdt, cdn) {
+        let row = locals[cdt][cdn];
+        let radiology = row.observation_template;
+
+        // console.log(radiology);
+
+        if (radiology) {
+            frappe.call({
+                method: 'healthcare.healthcare.doctype.patient_encounter.patient_encounter.get_schedule_procedures',
+                args: { radiology: radiology },
+                callback: function(response) {
+                    let procedures = response.message || [];
+                    let selected_procedures = frm.doc.radiology.map(row => row.schedule_procedure).filter(Boolean);
+                    let available_procedures = procedures.filter(procedure => !selected_procedures.includes(procedure));
+
+                    frappe.model.set_value(cdt, cdn, "schedule_procedure", ""); 
+
+                    frm.fields_dict["radiology"].grid.grid_rows_by_docname[cdn].get_field("schedule_procedure").get_query = function() {
+                        return {
+                            filters: [['Procedures', 'name', 'in', available_procedures]]
+                        };
+                    };
+
+                    frm.fields_dict["radiology"].grid.grid_rows_by_docname[cdn]
+                        .get_field("schedule_procedure")
+                        .df.read_only = 0;
+
+                    frm.refresh_field('radiology');
+                }
+            });
+        } else {
+            
+            frappe.model.set_value(cdt, cdn, "schedule_procedure", "");
+
+            frm.fields_dict["radiology"].grid.grid_rows_by_docname[cdn]
+                .get_field("schedule_procedure")
+                .df.read_only = 1;
+
+            frm.refresh_field('radiology');
+        }
+    }
+});
+
+
+
+

@@ -2,43 +2,171 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Sample Collection', {
+	// lab_test: function (frm) {
+	// 	
+    //     if (frm.doc.lab_test) {
+	// 		
+	// 		
+			
+			
+    //         frappe.db.get_value('Lab Test', frm.doc.lab_test, 'lab_test_name')
+    //             .then(r => {
+    //                 if (r.message) {
+    //                     frm.set_value('lab_test_name', r.message.lab_test_name);
+    //                 }
+    //             });
+    //     } else {
+	// 		
+			
+    //         frm.set_value('lab_test_name', '');
+    //     }
+    // },
+	// before_save: function(frm) {
+	// 	
+		
+    //     if (!frm.doc.status || frm.doc.status === "Pending") {
+    //         frm.set_value('status', 'Partly Collected');
+    //     }
+    // },
+
 	onload: function(frm) {
-		frappe.realtime.on("observation_creation_progress", (status) => {
-			if (status == "Completed") {
-				frm.reload_doc();
-				frappe.dom.unfreeze();
-			}
-		})
+
+		frm.set_df_property('observation_sample_collection', 'cannot_add_rows', true);
+		frm.set_df_property('observation_sample_collection', 'cannot_delete_rows', true);
+        frm.refresh_field('observation_sample_collection');
+
+		if(frm.doc.status=="Collected"&&frm.doc.docstatus==0){
+			
+			
+			frm.doc.status="Pending";
+		}
+		if (frm.doc.lab_test_name&&frm.doc.status==="Pending") {
+			frappe.call({
+				method: "healthcare.healthcare.doctype.sample_collection.sample_collection.get_templates",
+				args: {
+					lab_test: frm.doc.lab_test_name
+				},
+				callback: function (r) {
+					if (r.message) {
+					  
+						frm.clear_table('observation_sample_collection');
+						
+						r.message.forEach(template => {
+							let row = frm.add_child('observation_sample_collection');
+							row.observation_template= template.name;
+							row.sample=template.sample
+							frm.trigger("observation_template");
+							
+					});
+						// frm.refresh_field("sample");
+						frm.refresh_field('observation_sample_collection');
+					}
+					else {
+						frappe.msgprint(__('No Template  data found for the selected patient.'));
+					}
+				}    
+							 
+			})
+		}
 	},
-	refresh: function(frm) {
+	onload_post_render: function(frm) {
+        frappe.after_ajax(() => {
+          // Optional: Check if form is dirty
+          if (frm.is_dirty()) {
+            frm.save()
+          }
+        });
+    },
+	setup:function(frm){
+		frm.set_query("observation_template", "observation_sample_collection", function (doc, cdt, cdn) {
+            let d = locals[cdt][cdn];
+            let selected_observation_template = [];
+            $.each(doc.observation_sample_collection, function (i, row) {
+                if (row.observation_template) {
+                    selected_observation_template.push(row.observation_template)
+                }
+            })
+            return {
+                filters: {                   
+                    "observation_category":"Laboratory",
+					"name": ["Not In", selected_observation_template]
+                },
+            }
+        });
+
+	},
+	refresh: function (frm) {
 		frm.fields_dict.observation_sample_collection.grid.add_custom_button(__("Mark Collected"), () => {
 			selected_child = frm.fields_dict.observation_sample_collection.grid.get_selected_children()
 			if (selected_child.length > 0) {
 				frappe.confirm(__("Are you sure you want to mark selected samples as Collected"), function () {
-					frappe.dom.freeze(__('Creating Observations! Please Wait...'));
+					// frappe.dom.freeze(__('Creating Observations! Please Wait...'));
 					frappe.call({
 						"method": "healthcare.healthcare.doctype.sample_collection.sample_collection.create_observation",
 						args: {
 							selected: selected_child,
-							sample_collection: frm.doc.name
+							sample_collection: frm.doc.name,
+							patient:frm.doc.patient
 						},
-						freeze: true,
-						freeze_message: __("Marking Collected..."),
+						// freeze: true,
+						// freeze_message: __("Marking Collected..."),
 						callback: function (r) {
 							if (!r.exc) {
-								frm.reload_doc();
+								
+								if(r.message === "success"){
+								frappe.show_alert({ message: __('Lab Status updated to Acknowledge'), indicator: 'green' });
+								// frm.reload_doc();
+								window.location.reload();
+								}
+							
 							}
 						}
 					});
-				});
-			} else {
-				frappe.show_alert({
-					"message": "Select atleast one Sample",
-					"indicator": "orange",
-				});
-			}
-		}).addClass("btn-mark-collected");
 
+					
+								// const updateStatusResponse = await frappe.call({
+								// 	method: "healthcare.healthcare.api.update_lab_test_status_by_patient",
+								// 	args: {
+								// 		patient: frm.doc.patient,
+								// 	},
+								// });
+								// if (updateStatusResponse.message === "success"&& !updateStatusResponse.exc) {
+								// 	frm.refresh_field("observation_sample_collection");
+								// 	frappe.show_alert({ message: __('Status updated to Acknowledge'), indicator: 'green' });
+
+								// }else {
+								// 	frappe.msgprint({
+								// 		message: __("Error updating Lab Test status."),
+								// 		indicator: "red",
+								// 	});
+								// }
+							}
+					);
+				} else {
+					frappe.show_alert({
+						message: __("Select at least one Sample"),
+						indicator: "orange",
+					});
+				}
+			}
+		).addClass("btn-mark-collected");
+
+
+		
+		// frm.set_query("observation_template","observation_sample_collection" ,function (doc) {
+        //     // let selected_supplies = []
+        //     // $.each(doc.supplies, function (i, row) {
+        //     //     if (row.observation_template) {
+        //     //         selected_supplies.push(row.observation_template)
+        //     //     }
+        //     // })
+        //     return {
+        //         filters: {
+        //             "lab_test": ["=",frm.doc.lab_test_name]
+        //         },
+        //     }
+        // });
+	
 		if (frappe.defaults.get_default('create_sample_collection_for_lab_test')) {
 			frm.add_custom_button(__('View Lab Tests'), function() {
 				frappe.route_options = {'sample': frm.doc.name};
@@ -78,8 +206,48 @@ frappe.ui.form.on('Sample Collection', {
 				}
 			});
 		}
-	}
+	},
+
+	// observation_sample_collection_on_form_rendered: function(frm) {
+    //     update_specimen_text(frm);
+    // },
+
+    // onload: function(frm) {
+    //     update_specimen_text(frm);
+    // },
+
+    // observation_sample_collection_add: function(frm) {
+    //     update_specimen_text(frm);
+    // },
+
+    // observation_sample_collection_remove: function(frm) {
+    //     update_specimen_text(frm);
+    // },
 });
+
+// function update_specimen_text(frm) {
+// 	console.log("update_specimen_text");
+	
+//     let specimens = [];
+// 	frappe.after_ajax(() => {
+//     if (frm.doc.observation_sample_collection && frm.doc.observation_sample_collection.length > 0) {
+// 		console.log("************************************************************************************************");
+		
+//         for (let i = 0; i < frm.doc.observation_sample_collection.length; i++) {
+// 			console.log("________________________________________________________________________________");
+			
+//             let specimen = frm.doc.observation_sample_collection[i].specimen;
+//             if (specimen) {
+//                 specimens.push(specimen);
+//             }
+//         }
+//     }
+// });
+
+//     frm.set_value('specimen', specimens.join(', '));
+// 	console.log("----------------------------------------------------------------------------------------------");
+// 	frm.refresh_field('specimen');
+// }
 
 frappe.ui.form.on("Observation Sample Collection", {
 	sample: function(frm, cdt, cdn) {
@@ -232,8 +400,12 @@ frappe.ui.form.on("Observation Sample Collection", {
 			d.fields_dict.items.grid.add_custom_button(__("Mark Collected"), () => {
 				let selected_row = d.fields_dict.items.grid.get_selected_children();
 				if (selected_row.length > 0) {
+					
+					
 					frappe.confirm(__("Are you sure you want to mark selected samples as Collected"), function () {
-						frappe.dom.freeze(__('Creating Observations! Please Wait...'));
+						
+						
+						// frappe.dom.freeze(__('Creating Observations! Please Wait...'));
 						frappe.call({
 							"method": "healthcare.healthcare.doctype.sample_collection.sample_collection.create_observation",
 							args: {
@@ -242,12 +414,16 @@ frappe.ui.form.on("Observation Sample Collection", {
 								component_observations: row.component_observations,
 								child_name: row.name
 							},
-							freeze: true,
-							freeze_message: __("Marking Collected..."),
+							// freeze: true,
+							// freeze_message: __("Marking Collected..."),
 							callback: function (r) {
 								if (!r.exc) {
+									frm.reload_doc()
+									// setTimeout(() => {
+									// update_specimen_text(frm);
+									// }, 100);
 									d.hide()
-									frm.reload_doc();
+									// frm.reload_doc();
 								}
 							}
 						});
@@ -258,6 +434,7 @@ frappe.ui.form.on("Observation Sample Collection", {
 						"indicator": "orange",
 					});
 				}
+				
 			});
 
 			d.show();

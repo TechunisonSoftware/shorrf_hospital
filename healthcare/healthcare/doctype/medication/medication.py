@@ -10,7 +10,6 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.model.rename_doc import rename_doc
-from frappe.utils import get_link_to_form
 
 
 class Medication(Document):
@@ -22,17 +21,6 @@ class Medication(Document):
 			self.update_item_and_item_price()
 
 	def validate(self):
-		if not self.price_list and self.linked_items:
-			price_list = frappe.db.get_single_value("Selling Settings", "selling_price_list")
-			if price_list:
-				self.price_list = price_list
-			else:
-				frappe.throw(
-					_(
-						f"Please select a Price List for adding Item Price or set the Default Selling Price List in {get_link_to_form('Selling Settings', 'Selling Settings')}"
-					)
-				)
-
 		if self.linked_items:
 			for item in self.linked_items:
 				exist_medication = frappe.db.get_value(
@@ -64,17 +52,13 @@ class Medication(Document):
 						item_doc.disabled = 0
 						item_doc.save(ignore_permissions=True)
 						if item.rate:
-							item_price = frappe.db.exists(
-								"Item Price", {"item_code": item.item_code, "price_list": self.price_list}
-							)
-							if not item_price:
+							if not frappe.db.exists("Item Price", {"item_code": item.item_code}):
 								if item.item_code:
-									make_item_price(item.item_code, item.rate, self.price_list)
+									make_item_price(item.item_code, item.rate)
 							else:
-								item_price = frappe.get_doc("Item Price", item_price)
+								item_price = frappe.get_doc("Item Price", {"item_code": item.item_code})
 								item_price.item_name = item.item_code
 								item_price.price_list_rate = item.rate
-								item_price.price_list = self.price_list
 								item_price.save()
 
 				else:
@@ -116,15 +100,16 @@ def insert_item(doc, item):
 		item_doc.item_name = item.item_code  # also update the name and description of existing item
 		item_doc.description = item.description
 
-	make_item_price(item_doc.name, item.rate, doc.price_list)
+	make_item_price(item_doc.name, item.rate)
 	frappe.db.set_value("Medication Linked Item", item.name, "item", item.item_code)
 
 
-def make_item_price(item, item_price, price_list):
+def make_item_price(item, item_price):
+	price_list_name = frappe.db.get_value("Price List", {"selling": 1})
 	frappe.get_doc(
 		{
 			"doctype": "Item Price",
-			"price_list": price_list,
+			"price_list": price_list_name,
 			"item_code": item,
 			"price_list_rate": item_price,
 		}
@@ -141,43 +126,3 @@ def change_item_code_from_medication(item_code, doc):
 		rename_doc("Item", doc.item_code, item_code, ignore_permissions=True)
 		frappe.db.set_value("Medication", doc.name, "item_code", item_code)
 	return
-
-
-@frappe.whitelist()
-def get_children(parent=None, is_root=False, **filters):
-	if not parent or parent == "Medication":
-		frappe.msgprint(_("Please select a Medication"))
-		return
-
-	if parent:
-		frappe.form_dict.parent = parent
-
-	if frappe.form_dict.parent:
-		medication_doc = frappe.get_cached_doc("Medication", frappe.form_dict.parent)
-		frappe.has_permission("Medication", doc=medication_doc, throw=True)
-
-		medication_items = frappe.get_all(
-			"Medication Linked Item",
-			fields=["item as item_code", "rate"],
-			filters=[["parent", "=", frappe.form_dict.parent]],
-			order_by="idx",
-		)
-
-		item_names = tuple(d.get("item_code") for d in medication_items)
-
-		items = frappe.get_list(
-			"Item",
-			fields=["image", "description", "name", "stock_uom", "item_name"],
-			filters=[["name", "in", item_names]],
-		)  # to get only required item dicts
-
-		for medication_item in medication_items:
-			# extend medication_item dict with respective item dict
-			medication_item.update(
-				# returns an item dict from items list which matches with item_code
-				next(item for item in items if item.get("name") == medication_item.get("item_code"))
-			)
-			medication_item.image = frappe.db.escape(medication_item.image)
-			medication_item.currency = frappe.db.get_single_value("Global Defaults", "default_currency")
-
-		return medication_items

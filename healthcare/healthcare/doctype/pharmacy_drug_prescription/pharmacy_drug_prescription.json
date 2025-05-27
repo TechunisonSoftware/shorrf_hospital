@@ -1,0 +1,232 @@
+{
+ "actions": [],
+ "allow_copy": 1,
+ "creation": "2025-02-12 11:26:46.536608",
+ "doctype": "DocType",
+ "document_type": "Document",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "medication",
+  "drug_code",
+  "drug_name",
+  "strength",
+  "strength_uom",
+  "dosage_form",
+  "column_break_7",
+  "dosage_by_interval",
+  "dosage",
+  "interval",
+  "interval_uom",
+  "period",
+  "number_of_repeats_allowed",
+  "medication_status",
+  "dispensed_amount",
+  "qty",
+  "section_break_u9av",
+  "intent",
+  "priority",
+  "medication_request",
+  "section_break_13",
+  "comment",
+  "update_schedule"
+ ],
+ "fields": [
+  {
+   "fieldname": "medication",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Medication",
+   "options": "Medication",
+   "read_only": 1
+  },
+  {
+   "fieldname": "drug_code",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "label": "Drug Code",
+   "options": "Item",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "drug_code.item_name",
+   "fieldname": "drug_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Drug Name / Description",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "medication.strength",
+   "fieldname": "strength",
+   "fieldtype": "Float",
+   "label": "Strength",
+   "read_only": 1,
+   "read_only_depends_on": "eval: doc.medication"
+  },
+  {
+   "depends_on": "strength",
+   "fetch_from": "medication.strength_uom",
+   "fieldname": "strength_uom",
+   "fieldtype": "Link",
+   "label": "Strength UOM",
+   "options": "UOM",
+   "read_only": 1,
+   "read_only_depends_on": "eval: doc.medication"
+  },
+  {
+   "fetch_from": "medication.dosage_form",
+   "fetch_if_empty": 1,
+   "fieldname": "dosage_form",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "label": "Dosage Form",
+   "options": "Dosage Form",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "dosage_by_interval",
+   "fieldtype": "Check",
+   "label": "Dosage by Time Interval",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:!doc.dosage_by_interval",
+   "fetch_from": "medication.default_prescription_dosage",
+   "fetch_if_empty": 1,
+   "fieldname": "dosage",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Dosage",
+   "mandatory_depends_on": "eval:!doc.dosage_by_interval",
+   "options": "Prescription Dosage",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.dosage_by_interval",
+   "fetch_from": "medication.default_interval",
+   "fetch_if_empty": 1,
+   "fieldname": "interval",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Interval",
+   "mandatory_depends_on": "eval:doc.dosage_by_interval",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.dosage_by_interval",
+   "fetch_from": "medication.default_interval_uom",
+   "fetch_if_empty": 1,
+   "fieldname": "interval_uom",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Interval UOM",
+   "mandatory_depends_on": "eval:doc.dosage_by_interval",
+   "options": "\nHour\nDay",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "medication.default_prescription_duration",
+   "fetch_if_empty": 1,
+   "fieldname": "period",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "in_list_view": 1,
+   "label": "Period",
+   "options": "Prescription Duration",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "number_of_repeats_allowed",
+   "fieldtype": "Float",
+   "label": "Number Of Repeats Allowed",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_u9av",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "intent",
+   "fieldtype": "Link",
+   "label": "Intent",
+   "options": "Code Value",
+   "read_only": 1
+  },
+  {
+   "fieldname": "priority",
+   "fieldtype": "Link",
+   "label": "Priority",
+   "options": "Code Value",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "medication_request",
+   "fieldtype": "Data",
+   "label": "Medication Request",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_13",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "comment",
+   "fieldtype": "Small Text",
+   "ignore_xss_filter": 1,
+   "label": "Comment",
+   "read_only": 1
+  },
+  {
+   "default": "1",
+   "depends_on": "usage_interval",
+   "fieldname": "update_schedule",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Update Schedule",
+   "print_hide": 1,
+   "read_only": 1,
+   "report_hide": 1
+  },
+  {
+   "fieldname": "medication_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Medication Status",
+   "options": "\nBooked\nPartially Dispensed\nDispensed",
+   "read_only": 1
+  },
+  {
+   "fieldname": "dispensed_amount",
+   "fieldtype": "Float",
+   "label": "Pending Quantity"
+  },
+  {
+   "fieldname": "qty",
+   "fieldtype": "Float",
+   "label": "Qty"
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2025-03-05 13:55:21.293793",
+ "modified_by": "Administrator",
+ "module": "Healthcare",
+ "name": "Pharmacy Drug Prescription",
+ "owner": "Administrator",
+ "permissions": [],
+ "restrict_to_domain": "Healthcare",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -104,14 +104,14 @@
   {
    "fieldname": "observation_template",
    "fieldtype": "Link",
-   "in_list_view": 1,
+   "hidden": 1,
    "label": "Observation",
    "options": "Observation Template"
   }
  ],
  "istable": 1,
  "links": [],
- "modified": "2023-11-07 15:48:41.681329",
+ "modified": "2025-01-30 14:20:03.913248",
  "modified_by": "Administrator",
  "module": "Healthcare",
  "name": "Lab Prescription",

@@ -9,33 +9,199 @@ cur_frm.cscript.custom_refresh = function (doc) {
 	cur_frm.toggle_display('sb_descriptive_result', doc.imaging_toggle);
 };
 
-frappe.ui.form.on('Lab Test', {
-	setup: function (frm) {
-		frm.get_field('normal_test_items').grid.editable_fields = [
-			{ fieldname: 'lab_test_name', columns: 3 },
-			{ fieldname: 'lab_test_event', columns: 2 },
-			{ fieldname: 'result_value', columns: 2 },
-			{ fieldname: 'lab_test_uom', columns: 1 },
-			{ fieldname: 'normal_range', columns: 2 }
-		];
-		frm.get_field('descriptive_test_items').grid.editable_fields = [
-			{ fieldname: 'lab_test_particulars', columns: 3 },
-			{ fieldname: 'result_value', columns: 7 }
-		];
+frappe.ui.form.on('Lab Test', {	
+	validate: function (frm) {        
+        if (frm.is_submitted && frm.doc.lab_status === "Acknowledged" && frm.doc.__unsaved) {          
+            frappe.db.get_value('Lab Test', frm.doc.name, 'lab_status', (r) => {
+                if (r.lab_status === "Completed") {
+                    frappe.throw(__('Lab Status cannot be changed from Completed to Acknowledged after submission.'));
+                }
+            });
+        }
+		if (frm.doc.lab_test_name) {
+			let routeOptions={}
+			routeOptions = {
+                lab_test_name: frm.doc.lab_test_name
+            }
+			frappe.route_options=routeOptions
+			
+			
+		}
+    },
+	// setup: function (frm) {
+	// 	frm.get_field('normal_test_items').grid.editable_fields = [
+	// 		{ fieldname: 'lab_test_name', columns: 2 },
+	// 		{ fieldname: 'lab_test_event', columns: 2 },
+	// 		{ fieldname: 'result_value', columns: 1 },
+	// 		{ fieldname: 'lab_test_uom', columns: 1 },
+	// 		{ fieldname: 'normal_range', columns: 2 },
+	// 		{ fieldname: 'text', columns: 1 },
+	// 	];
+	// 	frm.get_field('descriptive_test_items').grid.editable_fields = [
+	// 		{ fieldname: 'lab_test_particulars', columns: 3 },
+	// 		{ fieldname: 'result_value', columns: 7 }
+	// 	];
 
-		frm.set_query('service_request', function() {
-			return {
-				filters: {
-					'patient': frm.doc.patient,
-					'status': 'Active',
-					'docstatus': 1,
-					'template_dt': 'Lab Test template'
-				}
-			};
-		});
-	},
+	// 	frm.set_query('service_request', function() {
+	// 		return {
+	// 			filters: {
+	// 				'patient': frm.doc.patient,
+	// 				'status': 'Active',
+	// 				'docstatus': 1,
+	// 				'template_dt': 'Lab Test template'
+	// 			}
+	// 		};
+	// 	});
+	// },
+
+	// lab_test_template: function(frm) {
+	// 	console.log("lab_test_template~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");		
+    //     frm.trigger("set_normal_test_items_visibility");
+    // },
+
+    // onload: function(frm) {
+	// 	console.log("onload^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");		
+    //     frm.trigger("set_normal_test_items_visibility");
+    // },
+
+    // set_normal_test_items_visibility: function(frm) {
+	// 	console.log("set_normal_test_items_visibility*********************************************************");
+    //     if (!frm.doc.template) return;
+
+    //     frappe.db.get_doc("Lab Test Template", frm.doc.template)
+    //         .then(doc => {
+	// 			console.log("doc~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", doc);
+				
+    //             let data_type = doc.permitted_data_type;
+
+    //             frm.fields_dict["normal_test_items"].grid.update_docfield_property("text", "hidden", data_type !== "Text");
+    //             frm.fields_dict["normal_test_items"].grid.update_docfield_property("options", "hidden", data_type !== "Select");
+
+    //             frm.fields_dict["normal_test_items"].grid.refresh();
+    //         });
+    // },
+
+	
+
+		// lab_test_template: function(frm) {
+		// 	frm.trigger("update_normal_test_items_columns");
+		// },
+	
+		// onload: function(frm) {
+		// 	frm.trigger("update_normal_test_items_columns");
+		// },
+	
+		// update_normal_test_items_columns: function(frm) {
+		// 	if (!frm.doc.template) return;
+	
+		// 	frappe.db.get_doc("Lab Test Template", frm.doc.template).then(template => {
+		// 		let data_type = template.permitted_data_type;
+		// 		console.log("data type:", data_type);
+	
+		// 		let grid = frm.get_field("normal_test_items").grid;
+	
+		// 		// Always make sure the grid is initialized before using update_docfield_property
+		// 		if (!grid || !grid.update_docfield_property) return;
+	
+		// 		let show_text = data_type === "Text";
+		// 		let show_select = data_type === "Select";
+	
+		// 		// Update column visibility
+		// 		// grid.update_docfield_property("text", "reqd", show_text);
+		// 		grid.update_docfield_property("text", "hidden", !show_text);
+	
+		// 		// grid.update_docfield_property("options", "reqd", show_select);
+		// 		grid.update_docfield_property("options", "hidden", !show_select);
+		// 		grid.update_docfield_property("text", "in_list_view", show_text);
+	
+		// 		grid.update_docfield_property("options", "in_list_view", show_select);
+
+		// 		// Optional: also update editable_columns layout
+		// 		grid.editable_fields = [
+		// 			{ fieldname: 'lab_test_name', columns: 2 },
+		// 			// { fieldname: 'lab_test_event', columns: 2 },
+		// 			{ fieldname: 'result_value', columns: 1 },
+		// 			// { fieldname: 'lab_test_uom', columns: 1 },
+		// 			{ fieldname: 'normal_range', columns: 1 },
+		// 			{ fieldname: 'text', columns: show_text ? 2 : 0 },
+		// 			{ fieldname: 'options', columns: show_select ? 2 : 0 }
+		// 		];
+				
+		// 		grid.visible_columns = null;
+		// 		grid.setup_visible_columns();
+		// 		grid.refresh();
+		// 		grid.grid_rows.forEach(row => row.refresh());
+				
+		// 		frm.refresh_field("normal_test_items");
+
+
+		// 	});
+		// },
+		update_normal_test_items_columns: function(frm) {
+			if (!frm.doc.template) return;
+		
+			frappe.db.get_doc("Lab Test Template", frm.doc.template).then(template => {
+				let data_type = template.permitted_data_type;
+				let grid = frm.get_field("normal_test_items").grid;
+		
+				if (!grid) return;
+		
+				// 1. Update column visibility (your existing logic)
+				let show_text = data_type === "Text";
+				let show_select = data_type === "Select";
+				
+				grid.update_docfield_property("text", "hidden", !show_text);
+				grid.update_docfield_property("options", "hidden", !show_select);
+				
+				grid.update_docfield_property("text", "in_list_view", show_text);
+	
+				grid.update_docfield_property("options", "in_list_view", show_select);
+
+				// Optional: also update editable_columns layout
+				grid.editable_fields = [
+					{ fieldname: 'lab_test_name', columns: 2 },
+					// { fieldname: 'lab_test_event', columns: 2 },
+					{ fieldname: 'result_value', columns: 1 },
+					// { fieldname: 'lab_test_uom', columns: 1 },
+					{ fieldname: 'normal_range', columns: 1 },
+					{ fieldname: 'text', columns: show_text ? 2 : 0 },
+					{ fieldname: 'options', columns: show_select ? 2 : 0 }
+				];
+				
+				grid.visible_columns = null;
+
+				// 2. FORCE ROW HEIGHT (Key Fix!)
+				setTimeout(() => { // Small delay to ensure DOM loads
+					// Set minimum row height for ALL rows
+					let rows = grid.grid_rows;
+					if (rows) {
+						rows.forEach(row => {
+							row.$wrapper.style.minHeight = "42px"; // Adjust height as needed
+							row.$wrapper.style.alignItems = "center"; // Keeps content centered vertically
+						});
+					}
+					
+					// Refresh the grid to apply changes
+					grid.refresh();
+					frm.refresh_field("normal_test_items");
+				}, 100);
+			});
+		},
+	
 
 	refresh: function (frm) {
+		if (frm.doc.docstatus === 0 && frm.doc.lab_status) {
+            let status_map = {
+                "Completed": "green",
+                "Acknowledge": "blue",
+                "Result Entry": "yellow",
+            };
+
+            let color = status_map[frm.doc.lab_status] || "gray";             
+            frm.page.set_indicator(frm.doc.lab_status, color);
+			
+        }
+
 		refresh_field('normal_test_items');
 		refresh_field('descriptive_test_items');
 		if (frm.doc.__islocal) {
@@ -321,3 +487,10 @@ var calculate_age = function (dob) {
 	var years = age.getFullYear() - 1970;
 	return `${years} ${__('Years(s)')} ${age.getMonth()} ${__('Month(s)')} ${age.getDate()} ${__('Day(s)')}`;
 };
+
+
+frappe.ui.form.on("Normal Test Result", {
+    normal_test_items_add: function(frm) {
+        frm.trigger("set_normal_test_items_visibility");
+    }
+});

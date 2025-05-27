@@ -1,0 +1,60 @@
+{
+    "actions": [],
+    "allow_rename": 1,
+    "creation": "2025-02-05 15:48:22.220800",
+    "doctype": "DocType",
+    "engine": "InnoDB",
+    "field_order": [
+     "mirth_connect_url",
+     "authenticate_user",
+     "authenticate_password",
+     "orthanc_url"
+    ],
+    "fields": [
+     {
+      "description": "Sample URL : https://127.0.0.1:6000",
+      "fieldname": "mirth_connect_url",
+      "fieldtype": "Data",
+      "label": "Mirth Connect URL"
+     },
+     {
+      "fieldname": "authenticate_user",
+      "fieldtype": "Data",
+      "label": "Authenticate User"
+     },
+     {
+      "fieldname": "authenticate_password",
+      "fieldtype": "Password",
+      "label": "Authenticate Password"
+     },
+     {
+      "description": "Sample URL : https://127.0.0.1:8042",
+      "fieldname": "orthanc_url",
+      "fieldtype": "Data",
+      "label": "Orthanc URL"
+     }
+    ],
+    "index_web_pages_for_search": 1,
+    "issingle": 1,
+    "links": [],
+    "modified": "2025-02-05 16:15:03.182214",
+    "modified_by": "Administrator",
+    "module": "Healthcare",
+    "name": "Radiology Setting",
+    "owner": "Administrator",
+    "permissions": [
+     {
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "print": 1,
+      "read": 1,
+      "role": "System Manager",
+      "share": 1,
+      "write": 1
+     }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC",
+    "states": []
+   }

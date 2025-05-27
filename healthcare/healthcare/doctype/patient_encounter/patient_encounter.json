@@ -11,14 +11,16 @@
  "field_order": [
   "naming_series",
   "title",
+  "patient",
   "appointment",
   "appointment_type",
-  "patient",
   "patient_name",
+  "uid",
   "patient_sex",
   "patient_age",
   "inpatient_record",
   "inpatient_status",
+  "allergies",
   "column_break_6",
   "company",
   "status",
@@ -30,26 +32,39 @@
   "google_meet_link",
   "invoiced",
   "submit_orders_on_save",
+  "medical_history",
   "sb_symptoms",
+  "chief_complaint",
+  "examination",
   "symptoms",
   "symptoms_in_print",
   "get_applicable_treatment_plans",
   "physical_examination",
-  "diagnosis",
+  "co_mordility",
+  "history_of_present_illness",
   "diagnosis_in_print",
+  "section_break_ipyd",
+  "provisional",
+  "diagnosis",
+  "column_break_iiws",
+  "final",
+  "doctor_notes",
   "codification",
   "codification_table",
   "sb_drug_prescription",
-  "drug_prescription",
-  "sb_test_prescription",
   "lab_test_prescription",
+  "radiology",
   "sb_procedures",
   "procedure_prescription",
   "rehabilitation_section",
   "therapy_plan",
   "therapies",
-  "section_break_33",
-  "encounter_comment",
+  "sb_test_prescription",
+  "drug_prescription",
+  "section_break_gjiv",
+  "patient_summary",
+  "column_break_sqif",
+  "follow_up_details",
   "sb_refs",
   "amended_from",
   "encounter_details_tab",
@@ -70,6 +85,7 @@
   {
    "fieldname": "naming_series",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Series",
    "no_copy": 1,
    "options": "HLC-ENC-.YYYY.-",
@@ -116,8 +132,9 @@
   {
    "fieldname": "company",
    "fieldtype": "Link",
-   "label": "Company",
-   "options": "Company"
+   "label": "Centre",
+   "options": "Company",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_6",
@@ -157,11 +174,12 @@
   {
    "fieldname": "sb_symptoms",
    "fieldtype": "Section Break",
-   "label": "Encounter Impression"
+   "label": "Visit Details"
   },
   {
    "fieldname": "symptoms",
    "fieldtype": "Table MultiSelect",
+   "hidden": 1,
    "ignore_xss_filter": 1,
    "label": "Symptoms",
    "no_copy": 1,
@@ -172,6 +190,7 @@
    "depends_on": "eval: doc.symptoms != ''",
    "fieldname": "symptoms_in_print",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "In print",
    "no_copy": 1,
    "print_hide": 1,
@@ -180,14 +199,6 @@
   {
    "fieldname": "physical_examination",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "diagnosis",
-   "fieldtype": "Table MultiSelect",
-   "ignore_xss_filter": 1,
-   "label": "Diagnosis",
-   "no_copy": 1,
-   "options": "Patient Encounter Diagnosis"
   },
   {
    "default": "1",
@@ -203,6 +214,7 @@
    "collapsible": 1,
    "fieldname": "codification",
    "fieldtype": "Section Break",
+   "hidden": 1,
    "label": "Medical Coding"
   },
   {
@@ -214,7 +226,7 @@
   {
    "fieldname": "sb_drug_prescription",
    "fieldtype": "Section Break",
-   "label": "Medications"
+   "label": "Investigations"
   },
   {
    "fieldname": "drug_prescription",
@@ -225,7 +237,7 @@
   {
    "fieldname": "sb_test_prescription",
    "fieldtype": "Section Break",
-   "label": "Investigations"
+   "label": "Medications"
   },
   {
    "fieldname": "lab_test_prescription",
@@ -246,13 +258,6 @@
    "options": "Procedure Prescription"
   },
   {
-   "fieldname": "encounter_comment",
-   "fieldtype": "Small Text",
-   "ignore_xss_filter": 1,
-   "label": "Review Details",
-   "no_copy": 1
-  },
-  {
    "fieldname": "amended_from",
    "fieldtype": "Link",
    "label": "Amended From",
@@ -271,10 +276,6 @@
    "fieldtype": "Table",
    "label": "Therapies",
    "options": "Therapy Plan Detail"
-  },
-  {
-   "fieldname": "section_break_33",
-   "fieldtype": "Section Break"
   },
   {
    "fieldname": "therapy_plan",
@@ -365,11 +366,12 @@
    "read_only": 1
   },
   {
-   "default": "0",
-   "depends_on": "eval:!doc.__islocal;",
+   "default": "1",
    "fieldname": "submit_orders_on_save",
    "fieldtype": "Check",
-   "label": "Submit Orders on Save"
+   "hidden": 1,
+   "label": "Submit Orders on Save",
+   "read_only": 1
   },
   {
    "depends_on": "eval:!doc.__islocal && doc.docstatus == 0;",
@@ -387,6 +389,100 @@
    "fieldname": "order_history_html",
    "fieldtype": "HTML",
    "label": "Order History"
+  },
+  {
+   "fetch_from": "patient.uid",
+   "fieldname": "uid",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "UID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "radiology",
+   "fieldtype": "Table",
+   "label": "Radiology",
+   "options": "Radiology"
+  },
+  {
+   "fieldname": "allergies",
+   "fieldtype": "Small Text",
+   "label": "Allergies"
+  },
+  {
+   "fieldname": "medical_history",
+   "fieldtype": "Small Text",
+   "label": "Medical History"
+  },
+  {
+   "fieldname": "chief_complaint",
+   "fieldtype": "Small Text",
+   "label": "Chief Complaint"
+  },
+  {
+   "fieldname": "co_mordility",
+   "fieldtype": "Small Text",
+   "label": "Co-Mordility"
+  },
+  {
+   "fieldname": "history_of_present_illness",
+   "fieldtype": "Small Text",
+   "label": "History of present illness"
+  },
+  {
+   "fieldname": "examination",
+   "fieldtype": "Small Text",
+   "label": "Examination"
+  },
+  {
+   "fieldname": "section_break_ipyd",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "provisional",
+   "fieldtype": "Check",
+   "label": "Provisional "
+  },
+  {
+   "fieldname": "diagnosis",
+   "fieldtype": "Table MultiSelect",
+   "label": "Diagnosis",
+   "options": "Patient Encounter Diagnosis"
+  },
+  {
+   "fieldname": "column_break_iiws",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "final",
+   "fieldtype": "Check",
+   "label": "Final"
+  },
+  {
+   "fieldname": "doctor_notes",
+   "fieldtype": "Small Text",
+   "label": "Doctor Notes"
+  },
+  {
+   "fieldname": "section_break_gjiv",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "patient_summary",
+   "fieldtype": "Small Text",
+   "label": "Patient Summary"
+  },
+  {
+   "fieldname": "column_break_sqif",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "follow_up_details",
+   "fieldtype": "Small Text",
+   "label": "Follow Up Details"
   }
  ],
  "is_submittable": 1,
@@ -394,9 +490,17 @@
   {
    "link_doctype": "Clinical Note",
    "link_fieldname": "reference_name"
+  },
+  {
+   "link_doctype": "Radiology Result Entry",
+   "link_fieldname": "patient_encounter"
+  },
+  {
+   "link_doctype": "Patients Assessment",
+   "link_fieldname": "patient_encounter"
   }
  ],
- "modified": "2023-11-07 18:03:12.793649",
+ "modified": "2025-05-15 10:13:25.033752",
  "modified_by": "Administrator",
  "module": "Healthcare",
  "name": "Patient Encounter",
@@ -420,7 +524,7 @@
   }
  ],
  "restrict_to_domain": "Healthcare",
- "search_fields": "patient, practitioner, medical_department, encounter_date, encounter_time",
+ "search_fields": "patient, practitioner, medical_department, encounter_date, encounter_time,uid",
  "show_name_in_global_search": 1,
  "sort_field": "modified",
  "sort_order": "DESC",

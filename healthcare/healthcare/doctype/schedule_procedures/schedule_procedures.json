@@ -1,0 +1,53 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:radiology",
+ "creation": "2025-02-24 10:12:10.374290",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "radiology",
+  "schedule_procedure"
+ ],
+ "fields": [
+  {
+   "fieldname": "radiology",
+   "fieldtype": "Link",
+   "label": "Radiology",
+   "options": "Observation Template",
+   "unique": 1
+  },
+  {
+   "allow_bulk_edit": 1,
+   "fieldname": "schedule_procedure",
+   "fieldtype": "Table",
+   "label": "Schedule Procedure",
+   "options": "Schedule Procedure Mapping"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-02-24 10:52:08.707448",
+ "modified_by": "Administrator",
+ "module": "Healthcare",
+ "name": "Schedule Procedures",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

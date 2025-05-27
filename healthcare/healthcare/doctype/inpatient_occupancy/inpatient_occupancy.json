@@ -9,7 +9,8 @@
   "check_in",
   "left",
   "check_out",
-  "invoiced"
+  "invoiced",
+  "parent_service_unit"
  ],
  "fields": [
   {
@@ -45,12 +46,20 @@
    "fieldtype": "Check",
    "label": "Invoiced",
    "read_only": 1
+  },
+  {
+   "fetch_from": "service_unit.parent_healthcare_service_unit",
+   "fieldname": "parent_service_unit",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Parent Service Unit"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2021-03-18 15:08:54.634132",
+ "modified": "2025-02-10 13:12:12.870646",
  "modified_by": "Administrator",
  "module": "Healthcare",
  "name": "Inpatient Occupancy",
@@ -60,5 +69,6 @@
  "restrict_to_domain": "Healthcare",
  "sort_field": "modified",
  "sort_order": "DESC",
+ "states": [],
  "track_changes": 1
 }

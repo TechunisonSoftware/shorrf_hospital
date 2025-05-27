@@ -169,7 +169,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2020-09-30 21:53:27.128591",
+ "modified": "2025-03-28 10:44:02.714961",
  "modified_by": "Administrator",
  "module": "Healthcare",
  "name": "Inpatient Medication Order",
@@ -191,6 +191,7 @@
  "search_fields": "patient_encounter, patient",
  "sort_field": "modified",
  "sort_order": "DESC",
+ "states": [],
  "title_field": "patient",
  "track_changes": 1
 }

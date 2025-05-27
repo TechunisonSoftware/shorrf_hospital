@@ -1,0 +1,744 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2025-04-24 14:34:59.030703",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "patient_details_section",
+  "patient",
+  "column_break_ttni",
+  "age",
+  "column_break_znhk",
+  "sex",
+  "column_break_ipcv",
+  "aadhar_no",
+  "column_break_yfrk",
+  "martial_status",
+  "column_break_gans",
+  "centre",
+  "address_details_section",
+  "pincode",
+  "column_break_nsch",
+  "village",
+  "column_break_wkas",
+  "panchayat",
+  "column_break_wpuj",
+  "taluk",
+  "column_break_vxkt",
+  "district",
+  "column_break_minl",
+  "state",
+  "section_break_kbro",
+  "education",
+  "naming_series",
+  "column_break_vyqa",
+  "occupation",
+  "occupation_others",
+  "column_break_taci",
+  "approx_monthly_income",
+  "bmi_section",
+  "height",
+  "column_break_drer",
+  "weight",
+  "bmi",
+  "column_break_cems",
+  "waist_circumference_in_cms",
+  "known_cases_of_section",
+  "cancer",
+  "diabetes_mellitus",
+  "past_tb",
+  "column_break_xrth",
+  "current_hiv",
+  "hypertension",
+  "stoke",
+  "column_break_jduu",
+  "current_tb",
+  "past_hiv",
+  "bp_and_sugar_section",
+  "column_break_rahs",
+  "bp_in_mmhg",
+  "column_break_ddpt",
+  "int_mysp",
+  "column_break_qakf",
+  "sugar_in_mg",
+  "cataract_for_more_than_40_years_section",
+  "re",
+  "column_break_jrst",
+  "le",
+  "cancer_screening_section",
+  "a_change_in_a_wart_or_mole",
+  "blood_loss_from_any_natural_orifice",
+  "column_break_zhjn",
+  "a_persistent_change_in_digestive_and_bowel_habits",
+  "a_swelling_or_sore_that_does_not_get_better",
+  "column_break_bdta",
+  "a_persistent_cough_or_hoarseness",
+  "lump_or_hard_area_in_breast",
+  "column_break_puqm",
+  "unexplained_loss_of_weight",
+  "abnormal_menstrual_bleeding",
+  "doctor_notes_section",
+  "doctor_notes",
+  "health_behaviour_tab",
+  "substance_abuse_section",
+  "substance",
+  "column_break_jhjd",
+  "frequency",
+  "quantity",
+  "column_break_uhol",
+  "duration_in_yrs",
+  "period",
+  "insurance_section_tab",
+  "insurance_section_section",
+  "health_insurance_coverage",
+  "column_break_bsvw",
+  "health_insurance_coverage_others",
+  "previous_illness_episode_tab",
+  "previous_illness_episode",
+  "reason_for_not_seeking_treatment",
+  "reason_for_not_seeking_treatment_others",
+  "main_problem_faced_by_previous_healthcare_provider_section",
+  "main_problem_faced_by_previous_healthcare_provider",
+  "column_break_sknv",
+  "main_problem_faced_by_previous_healthcare_provider_others",
+  "oop_expenditure_healthcare_others",
+  "medicine",
+  "ot_charges",
+  "column_break_bopd",
+  "opd_charges",
+  "others",
+  "column_break_eqwr",
+  "ward_charges",
+  "indirect_out_of_pocket_expenditure_on_healthcare_section",
+  "travel_charges",
+  "attenders_cost",
+  "column_break_yngp",
+  "food",
+  "indirect_out_of_pocket_expenditure_on_healthcare_other",
+  "column_break_sfqn",
+  "loss_of_wages"
+ ],
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Series",
+   "options": "HLC-PP-.YYYY.-"
+  },
+  {
+   "fetch_from": "patient.patient_age",
+   "fieldname": "age",
+   "fieldtype": "Data",
+   "label": "Age",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "patient.sex",
+   "fieldname": "sex",
+   "fieldtype": "Data",
+   "label": "Sex",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "patient.aadhar_number",
+   "fieldname": "aadhar_no",
+   "fieldtype": "Data",
+   "label": "Aadhar No",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_vyqa",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_taci",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "panchayat",
+   "fieldtype": "Data",
+   "label": "Panchayat"
+  },
+  {
+   "fieldname": "pincode",
+   "fieldtype": "Int",
+   "label": "Pincode"
+  },
+  {
+   "fieldname": "taluk",
+   "fieldtype": "Data",
+   "label": "Taluk"
+  },
+  {
+   "fieldname": "district",
+   "fieldtype": "Data",
+   "label": "District"
+  },
+  {
+   "fieldname": "state",
+   "fieldtype": "Data",
+   "label": "State"
+  },
+  {
+   "fetch_from": "patient.marital_status",
+   "fieldname": "martial_status",
+   "fieldtype": "Data",
+   "label": "Martial Status",
+   "read_only": 1
+  },
+  {
+   "fieldname": "education",
+   "fieldtype": "Select",
+   "label": "Education",
+   "options": "\nNo Formal Schooling\nLess than Primary School\nPrimary School Completed\nSecondary School Completed\nHigh School Completed\nPre-University Completed\nCollege/University Completed\nPost Graduate Degree Completed"
+  },
+  {
+   "fieldname": "occupation",
+   "fieldtype": "Select",
+   "label": "Occupation",
+   "options": "\nFarmer\nGovt Employee\nPrivate Sector\nOthers"
+  },
+  {
+   "fieldname": "occupation_others",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Others"
+  },
+  {
+   "fieldname": "approx_monthly_income",
+   "fieldtype": "Select",
+   "label": "Approx Monthly Income",
+   "options": "\n0 \u2013 10k\n10-20k\n20-30k\n30-50k\n50-75k\n75-1L\n>1L"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "bmi_section",
+   "fieldtype": "Section Break",
+   "label": "Anthropometry"
+  },
+  {
+   "fieldname": "column_break_drer",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "bmi",
+   "fieldtype": "Float",
+   "label": "BMI",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "bp_and_sugar_section",
+   "fieldtype": "Section Break",
+   "label": "HTN DM"
+  },
+  {
+   "fieldname": "bp_in_mmhg",
+   "fieldtype": "Int",
+   "label": "Systolic BP (mmHg)"
+  },
+  {
+   "fieldname": "sugar_in_mg",
+   "fieldtype": "Float",
+   "label": "RBS (In mg%)"
+  },
+  {
+   "fieldname": "column_break_qakf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "health_behaviour_tab",
+   "fieldtype": "Tab Break",
+   "label": "Health Behaviour"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "substance_abuse_section",
+   "fieldtype": "Section Break",
+   "label": "Substance Abuse"
+  },
+  {
+   "fieldname": "substance",
+   "fieldtype": "Table MultiSelect",
+   "label": "Substance",
+   "options": "Substance Multiselect"
+  },
+  {
+   "fieldname": "frequency",
+   "fieldtype": "Select",
+   "label": "Frequency",
+   "options": "\nNever\nOccasional\nDaily\nPast User"
+  },
+  {
+   "fieldname": "quantity",
+   "fieldtype": "Int",
+   "label": "Quantity"
+  },
+  {
+   "fieldname": "column_break_jhjd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_uhol",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "duration_in_yrs",
+   "fieldtype": "Int",
+   "label": "Duration (In yrs)"
+  },
+  {
+   "fieldname": "a_change_in_a_wart_or_mole",
+   "fieldtype": "Select",
+   "label": "A Change in a Wart or Mole",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "a_persistent_change_in_digestive_and_bowel_habits",
+   "fieldtype": "Select",
+   "label": "A Persistent Change in Digestive and Bowel Habits",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "a_persistent_cough_or_hoarseness",
+   "fieldtype": "Select",
+   "label": "A Persistent Cough or Hoarseness",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "abnormal_menstrual_bleeding",
+   "fieldtype": "Select",
+   "label": "Female - Excessive Loss of Blood at the Monthly Period or Loss of Blood Outside the Usual Dates",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "blood_loss_from_any_natural_orifice",
+   "fieldtype": "Select",
+   "label": "Blood Loss from any Natural Orifice",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "a_swelling_or_sore_that_does_not_get_better",
+   "fieldtype": "Select",
+   "label": "A Swelling or Sore that does not get better",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "unexplained_loss_of_weight",
+   "fieldtype": "Select",
+   "label": "Unexplained Loss of Weight",
+   "options": "\nYes\nNo"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "insurance_section_section",
+   "fieldtype": "Section Break",
+   "label": "Health Insurance Coverage"
+  },
+  {
+   "fieldname": "health_insurance_coverage",
+   "fieldtype": "Select",
+   "label": "Health Insurance Coverage",
+   "options": "\nNo\nAyushman Bharat\nESI\nPrivate\nOthers"
+  },
+  {
+   "fieldname": "period",
+   "fieldtype": "Select",
+   "label": "Period",
+   "options": "\nDay\nWeek\nMonth"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "cancer_screening_section",
+   "fieldtype": "Section Break",
+   "label": "Cancer Screening"
+  },
+  {
+   "fieldname": "column_break_bsvw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "insurance_section_tab",
+   "fieldtype": "Tab Break",
+   "label": "Insurance Section"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "previous_illness_episode_tab",
+   "fieldtype": "Section Break",
+   "label": "In the previous Illness episode, healthcare was sought from"
+  },
+  {
+   "fieldname": "previous_illness_episode",
+   "fieldtype": "Select",
+   "label": "In the previous Illness episode, healthcare was sought from",
+   "options": "\nPHC\nTaluk Hospital\nDistrict Hospital\nPrivate\nDoctor/Clinic\nLocal Medical Stores\nDid not go for any treatment"
+  },
+  {
+   "fieldname": "health_insurance_coverage_others",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Others"
+  },
+  {
+   "fieldname": "reason_for_not_seeking_treatment",
+   "fieldtype": "Table MultiSelect",
+   "hidden": 1,
+   "label": "Reason for not seeking treatment",
+   "options": "Treatment Avoidance Reason Detail"
+  },
+  {
+   "fieldname": "reason_for_not_seeking_treatment_others",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Others"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "main_problem_faced_by_previous_healthcare_provider_section",
+   "fieldtype": "Section Break",
+   "label": "Main problem faced by previous healthcare provider"
+  },
+  {
+   "fieldname": "main_problem_faced_by_previous_healthcare_provider",
+   "fieldtype": "Select",
+   "label": "Main problem faced by previous healthcare provider",
+   "options": "\nHigh Consultation Fees\nHigh Medicines Cost\nLong waiting period\nDoctor not available\nMedicines stock out\nTravel distance is more\nNo Problem faced\nOthers"
+  },
+  {
+   "fieldname": "main_problem_faced_by_previous_healthcare_provider_others",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "Others"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "indirect_out_of_pocket_expenditure_on_healthcare_section",
+   "fieldtype": "Section Break",
+   "label": "Indirect Out of Pocket expenditure on healthcare"
+  },
+  {
+   "fieldname": "travel_charges",
+   "fieldtype": "Data",
+   "label": "Travel Charges"
+  },
+  {
+   "fieldname": "food",
+   "fieldtype": "Data",
+   "label": "Food"
+  },
+  {
+   "fieldname": "loss_of_wages",
+   "fieldtype": "Data",
+   "label": "Loss of wages"
+  },
+  {
+   "fieldname": "attenders_cost",
+   "fieldtype": "Data",
+   "label": "Attender's Cost"
+  },
+  {
+   "fieldname": "indirect_out_of_pocket_expenditure_on_healthcare_other",
+   "fieldtype": "Data",
+   "label": "Others"
+  },
+  {
+   "fieldname": "column_break_sknv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "oop_expenditure_healthcare_others",
+   "fieldtype": "Section Break",
+   "label": "Direct out of pocket expenditure on healthcare in previous illness episode"
+  },
+  {
+   "fieldname": "medicine",
+   "fieldtype": "Data",
+   "label": "Medicine"
+  },
+  {
+   "fieldname": "column_break_yngp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_sfqn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ot_charges",
+   "fieldtype": "Data",
+   "label": "OT Charges"
+  },
+  {
+   "fieldname": "column_break_bopd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "opd_charges",
+   "fieldtype": "Data",
+   "label": "OPD Charges"
+  },
+  {
+   "fieldname": "others",
+   "fieldtype": "Data",
+   "label": "Others"
+  },
+  {
+   "fieldname": "column_break_eqwr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ward_charges",
+   "fieldtype": "Data",
+   "label": "Ward Charges"
+  },
+  {
+   "fieldname": "height",
+   "fieldtype": "Float",
+   "label": "Height (In cms)"
+  },
+  {
+   "fieldname": "weight",
+   "fieldtype": "Float",
+   "label": "Weight (In Kilogram)",
+   "precision": "2"
+  },
+  {
+   "fieldname": "patient",
+   "fieldtype": "Link",
+   "label": "Name",
+   "options": "Patient"
+  },
+  {
+   "fieldname": "column_break_cems",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "waist_circumference_in_cms",
+   "fieldtype": "Float",
+   "label": "Waist Circumference (In cms)"
+  },
+  {
+   "fieldname": "column_break_ddpt",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "int_mysp",
+   "fieldtype": "Int",
+   "label": "Diastolic BP (mmHg)"
+  },
+  {
+   "fieldname": "patient_details_section",
+   "fieldtype": "Section Break",
+   "label": "Patient Details"
+  },
+  {
+   "fieldname": "column_break_ttni",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_znhk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_ipcv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_yfrk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "address_details_section",
+   "fieldtype": "Section Break",
+   "label": "Address Details"
+  },
+  {
+   "fieldname": "village",
+   "fieldtype": "Data",
+   "label": "Village"
+  },
+  {
+   "fieldname": "section_break_kbro",
+   "fieldtype": "Section Break",
+   "label": "Social Status"
+  },
+  {
+   "fieldname": "column_break_nsch",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_wkas",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_wpuj",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_vxkt",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_minl",
+   "fieldtype": "Column Break"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "cataract_for_more_than_40_years_section",
+   "fieldtype": "Section Break",
+   "label": "Cataract (for more than 40 years)"
+  },
+  {
+   "fieldname": "re",
+   "fieldtype": "Select",
+   "label": "RE",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "column_break_jrst",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "le",
+   "fieldtype": "Select",
+   "label": "LE",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "column_break_rahs",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "doctor_notes_section",
+   "fieldtype": "Section Break",
+   "label": "Doctor Notes"
+  },
+  {
+   "fieldname": "doctor_notes",
+   "fieldtype": "Small Text",
+   "label": "Doctor Notes"
+  },
+  {
+   "fieldname": "column_break_zhjn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_bdta",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_puqm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "lump_or_hard_area_in_breast",
+   "fieldtype": "Select",
+   "label": "Female - Lump or hard area in the breast",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "column_break_gans",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "patient.company",
+   "fieldname": "centre",
+   "fieldtype": "Link",
+   "label": "Centre",
+   "options": "Company",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "known_cases_of_section",
+   "fieldtype": "Section Break",
+   "label": "Known Cases of"
+  },
+  {
+   "fieldname": "cancer",
+   "fieldtype": "Select",
+   "label": "Cancer",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "diabetes_mellitus",
+   "fieldtype": "Select",
+   "label": "Diabetes Mellitus",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "past_tb",
+   "fieldtype": "Select",
+   "label": "Past TB",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "column_break_xrth",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "current_hiv",
+   "fieldtype": "Select",
+   "label": "Current HIV",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "hypertension",
+   "fieldtype": "Select",
+   "label": "Hypertension",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "stoke",
+   "fieldtype": "Select",
+   "label": "Stoke",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "column_break_jduu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "current_tb",
+   "fieldtype": "Select",
+   "label": "Current TB",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "past_hiv",
+   "fieldtype": "Select",
+   "label": "Past HIV",
+   "options": "\nYes\nNo"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-05-13 12:22:39.254612",
+ "modified_by": "Administrator",
+ "module": "Healthcare",
+ "name": "Patient Profiling",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

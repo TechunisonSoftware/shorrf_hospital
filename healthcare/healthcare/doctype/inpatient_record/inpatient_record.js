@@ -12,6 +12,22 @@ frappe.ui.form.on('Inpatient Record', {
 		];
 	},
 	refresh: function(frm) {
+		let inpatient_occupancies = frm.doc.inpatient_occupancies || [];	
+	
+		if (inpatient_occupancies.length > 0) {
+			let latest_occupancy = inpatient_occupancies[inpatient_occupancies.length - 1];
+			console.log("Latest Occupancy:", latest_occupancy);
+			frm.set_value("ward", latest_occupancy.parent_service_unit).then(() => {
+				// console.log("Test");
+				
+				// console.log(frm.doc.__unsaved);
+								
+				if (frm.doc.__unsaved) {
+					frm.save();
+				}
+			});
+		}
+		
 		frm.set_query('admission_service_unit_type', function() {
 			return {
 				filters: {
@@ -54,6 +70,8 @@ frappe.ui.form.on('Inpatient Record', {
 				"reference_name": frm.doc.name}
 					frappe.new_doc("Clinical Note");
 		},__('Create'));
+		$('button[data-doctype="Clinical Note"]').hide();
+		
 	},
 	btn_transfer: function(frm) {
 		transfer_patient_dialog(frm);
@@ -85,6 +103,7 @@ let admit_patient_dialog = function(frm) {
 			{fieldtype: 'Link', label: 'Service Unit', fieldname: 'service_unit',
 				options: 'Healthcare Service Unit', reqd: 1
 			},
+			{fieldtype: 'Check', label: 'Is MLC ?', fieldname: 'mfc'},
 			{fieldtype: 'Datetime', label: 'Admission Datetime', fieldname: 'check_in',
 				reqd: 1, default: frappe.datetime.now_datetime()
 			},
@@ -152,7 +171,7 @@ let transfer_patient_dialog = function(frm) {
 		width: 100,
 		fields: [
 			{fieldtype: 'Link', label: 'Leave From', fieldname: 'leave_from', options: 'Healthcare Service Unit', reqd: 1, read_only:1},
-			{fieldtype: 'Link', label: 'Service Unit Type', fieldname: 'service_unit_type', options: 'Healthcare Service Unit Type'},
+			{fieldtype: 'Link', label: 'Service Unit Type', fieldname: 'service_unit_type', options: 'Healthcare Service Unit Type',default:'Inpatient Units'},
 			{fieldtype: 'Link', label: 'Transfer To', fieldname: 'service_unit', options: 'Healthcare Service Unit', reqd: 1},
 			{fieldtype: 'Datetime', label: 'Check In', fieldname: 'check_in', reqd: 1, default: frappe.datetime.now_datetime()}
 		],
@@ -326,3 +345,4 @@ let cancel_ip_order = function(frm) {
 		});
 	}, __('Reason for Cancellation'), __('Submit'));
 }
+

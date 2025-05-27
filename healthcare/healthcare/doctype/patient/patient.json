@@ -2,7 +2,6 @@
  "actions": [],
  "allow_events_in_timeline": 1,
  "allow_import": 1,
- "allow_rename": 1,
  "autoname": "naming_series:",
  "creation": "2017-01-23 14:03:49.084370",
  "description": "Patient",
@@ -10,6 +9,7 @@
  "document_type": "Document",
  "engine": "InnoDB",
  "field_order": [
+  "company",
   "basic_info",
   "naming_series",
   "first_name",
@@ -17,19 +17,24 @@
   "last_name",
   "patient_name",
   "sex",
-  "blood_group",
   "dob",
   "age_html",
+  "patient_age",
+  "aadhar_number",
+  "not_having_aadhar",
   "image",
   "column_break_14",
-  "status",
   "uid",
-  "inpatient_record",
-  "inpatient_status",
+  "status",
+  "blood_group",
   "report_preference",
+  "marital_status",
   "mobile",
   "phone",
   "email",
+  "registration_date",
+  "inpatient_record",
+  "inpatient_status",
   "invite_user",
   "user_id",
   "customer_details_section",
@@ -53,8 +58,6 @@
   "medical_history_tab",
   "personal_and_social_history",
   "occupation",
-  "column_break_25",
-  "marital_status",
   "allergy_medical_and_surgical_history",
   "allergies",
   "medication",
@@ -68,7 +71,9 @@
   "alcohol_current_use",
   "column_break_32",
   "surrounding_factors",
-  "other_risk_factors"
+  "other_risk_factors",
+  "barcode_tab",
+  "patient_barcode"
  ],
  "fields": [
   {
@@ -137,9 +142,12 @@
    "bold": 1,
    "fieldname": "dob",
    "fieldtype": "Date",
+   "in_list_view": 1,
    "in_preview": 1,
-   "label": "Date of birth",
-   "no_copy": 1
+   "in_standard_filter": 1,
+   "label": "DOB",
+   "no_copy": 1,
+   "reqd": 1
   },
   {
    "fieldname": "age_html",
@@ -189,7 +197,7 @@
    "fieldname": "report_preference",
    "fieldtype": "Select",
    "label": "Report Preference",
-   "options": "\nEmail\nPrint"
+   "options": "\nMobile\nEmail\nPrint"
   },
   {
    "bold": 1,
@@ -199,7 +207,8 @@
    "in_standard_filter": 1,
    "label": "Mobile",
    "no_copy": 1,
-   "options": "Phone"
+   "options": "Phone",
+   "reqd": 1
   },
   {
    "bold": 1,
@@ -208,6 +217,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Email",
+   "mandatory_depends_on": "eval:doc.report_preference==='Email'",
    "no_copy": 1,
    "options": "Email"
   },
@@ -278,10 +288,6 @@
    "ignore_xss_filter": 1,
    "label": "Occupation",
    "no_copy": 1
-  },
-  {
-   "fieldname": "column_break_25",
-   "fieldtype": "Column Break"
   },
   {
    "fieldname": "marital_status",
@@ -367,7 +373,8 @@
    "fieldname": "last_name",
    "fieldtype": "Data",
    "label": "Last Name",
-   "no_copy": 1
+   "no_copy": 1,
+   "reqd": 1
   },
   {
    "fieldname": "first_name",
@@ -387,6 +394,7 @@
    "collapsible": 1,
    "fieldname": "customer_details_section",
    "fieldtype": "Section Break",
+   "hidden": 1,
    "label": "Customer Details"
   },
   {
@@ -449,6 +457,7 @@
    "fieldtype": "Check",
    "label": "Invite as User",
    "no_copy": 1,
+   "permlevel": 1,
    "read_only_depends_on": "eval: doc.user_id"
   },
   {
@@ -459,13 +468,11 @@
    "options": "User"
   },
   {
-   "allow_in_quick_entry": 1,
-   "bold": 1,
    "fieldname": "uid",
    "fieldtype": "Data",
    "in_standard_filter": 1,
-   "label": "Identification Number (UID)",
-   "unique": 1
+   "label": "UID",
+   "read_only": 1
   },
   {
    "fieldname": "dashboard_tab",
@@ -483,16 +490,60 @@
    "fieldname": "medical_history_tab",
    "fieldtype": "Tab Break",
    "label": "Medical History"
+  },
+  {
+   "fieldname": "patient_barcode",
+   "fieldtype": "Barcode",
+   "label": "Patient Barcode"
+  },
+  {
+   "fieldname": "registration_date",
+   "fieldtype": "Data",
+   "label": "Registration Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "barcode_tab",
+   "fieldtype": "Tab Break",
+   "label": "Barcode "
+  },
+  {
+   "fieldname": "aadhar_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Aadhar Number",
+   "mandatory_depends_on": "eval:doc.not_having_aadhar==0"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Centre",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "not_having_aadhar",
+   "fieldtype": "Check",
+   "label": "Aadhar Not Available",
+   "permlevel": 1
+  },
+  {
+   "fieldname": "patient_age",
+   "fieldtype": "Data",
+   "label": "Age"
   }
  ],
  "icon": "fa fa-user",
  "image_field": "image",
  "links": [],
  "max_attachments": 50,
- "modified": "2023-01-13 17:48:59.069268",
+ "modified": "2025-05-15 09:35:47.384061",
  "modified_by": "Administrator",
  "module": "Healthcare",
  "name": "Patient",
+ "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [
   {
@@ -544,7 +595,6 @@
    "write": 1
   }
  ],
- "quick_entry": 1,
  "restrict_to_domain": "Healthcare",
  "search_fields": "patient_name,mobile,email,phone,uid",
  "show_name_in_global_search": 1,

@@ -1,7 +1,7 @@
 from . import __version__ as app_version  # noqa
 
 app_name = "healthcare"
-app_title = "Marley Health"
+app_title = "Frappe Health"
 app_publisher = "earthians Health Informatics Pvt. Ltd."
 app_description = "Modern, Open Source HIS built on Frappe and ERPNext"
 app_icon = "octicon octicon-file-directory"
@@ -15,7 +15,13 @@ required_apps = ["erpnext"]
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/healthcare/css/healthcare.css"
-app_include_js = "healthcare.bundle.js"
+# app_include_js = "healthcare.bundle.js"
+# app_include_js = "/assets/healthcare/js/voice_recording.js"
+app_include_js = [
+    "healthcare.bundle.js",
+    "/assets/healthcare/js/voice_recording.js",
+    "/assets/healthcare/js/utils.js"
+]
 
 # include js, css files in header of web template
 # web_include_css = "/assets/healthcare/css/healthcare.css"
@@ -32,7 +38,10 @@ app_include_js = "healthcare.bundle.js"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-doctype_js = {"Sales Invoice": "public/js/sales_invoice.js"}
+doctype_js = {
+	"Sales Invoice": "public/js/sales_invoice.js",
+	
+}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -62,7 +71,6 @@ jinja = {
 	"methods": [
 		"healthcare.healthcare.doctype.diagnostic_report.diagnostic_report.diagnostic_report_print",
 		"healthcare.healthcare.utils.generate_barcodes",
-		"healthcare.healthcare.doctype.observation.observation.get_observations_for_medical_record",
 	]
 }
 
@@ -124,43 +132,51 @@ doc_events = {
 		"on_trash": "healthcare.healthcare.utils.company_on_trash",
 	},
 	"Patient": {
-		"after_insert": "healthcare.regional.india.abdm.utils.set_consent_attachment_details"
+		"after_insert": "healthcare.regional.india.abdm.utils.set_consent_attachment_details",
+        # "on_update": "healthcare.healthcare.doctype.patient.patient.on_save"
 	},
+	"Patient Encounter": {
+        "on_submit": "healthcare.healthcare.doctype.patient_encounter.patient_encounter.on_submit"
+    },
+	"Lab Test": {
+        "on_update": "healthcare.healthcare.api.update_lab_test_status_based_on_items",
+		
+    }
 }
 
 scheduler_events = {
+	"cron": {
+		"*/2 * * * *": [
+			"healthcare.healthcare.tasks.send_scheduled_job_log_emails"
+		],
+		"*/15 * * * *": [			
+			
+			# "healthcare.healthcare.tasks.run_hourly_task",
+			
+		],
+	},
 	"all": [
 		"healthcare.healthcare.doctype.patient_appointment.patient_appointment.send_appointment_reminder",
+		"healthcare.healthcare.tasks.send_scheduled_job_log_emails"
+		
 	],
 	"daily": [
 		"healthcare.healthcare.doctype.patient_appointment.patient_appointment.update_appointment_status",
 		"healthcare.healthcare.doctype.fee_validity.fee_validity.update_validity_status",
+		# "healthcare.healthcare.tasks.send_scheduled_job_log_emails"
+		
 	],
+	"hourly": [
+        # "healthcare.healthcare.tasks.run_hourly_task",
+		
+    ],
+	"yearly": [
+        "healthcare.healthcare.tasks.send_scheduled_job_log_emails"
+    ],
+
 }
 
-# Scheduled Tasks
-# ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"healthcare.tasks.all"
-# 	],
-# 	"daily": [
-# 		"healthcare.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"healthcare.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"healthcare.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"healthcare.tasks.monthly"
-# 	],
-# }
-
-# Testing
-# -------
 
 before_tests = "healthcare.healthcare.utils.before_tests"
 
@@ -288,9 +304,5 @@ standard_queries = {
 }
 
 treeviews = [
-	"Healthcare Service Unit",
-]
-
-company_data_to_be_ignored = [
 	"Healthcare Service Unit",
 ]

@@ -2,6 +2,19 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Vital Signs', {
+	onload: function(frm) {
+		healthcare.utils.set_company_if_local(frm);
+		frm.fields_dict.patient.get_query = function() {
+            if (frm.doc.company) {
+                return {
+                    filters: {
+                        company: frm.doc.company
+                    }
+                };
+            }
+        };
+	},
+
 	height: function(frm) {
 		if (frm.doc.height && frm.doc.weight) {
 			calculate_bmi(frm);

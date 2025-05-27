@@ -12,6 +12,7 @@
   "title",
   "patient",
   "patient_name",
+  "uid",
   "inpatient_record",
   "appointment",
   "encounter",
@@ -218,8 +219,9 @@
   {
    "fieldname": "company",
    "fieldtype": "Link",
-   "label": "Company",
-   "options": "Company"
+   "label": "Centre",
+   "options": "Company",
+   "reqd": 1
   },
   {
    "fieldname": "amended_from",
@@ -238,9 +240,9 @@
   {
    "fieldname": "naming_series",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Series",
-   "options": "HLC-VTS-.YYYY.-",
-   "reqd": 1
+   "options": "HLC-VTS-.YYYY.-"
   },
   {
    "allow_on_submit": 1,
@@ -252,11 +254,18 @@
    "no_copy": 1,
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fetch_from": "patient.uid",
+   "fieldname": "uid",
+   "fieldtype": "Data",
+   "label": "UID",
+   "read_only": 1
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2024-03-07 12:14:26.166928",
+ "modified": "2025-05-02 11:02:22.616400",
  "modified_by": "Administrator",
  "module": "Healthcare",
  "name": "Vital Signs",
@@ -293,7 +302,7 @@
   }
  ],
  "restrict_to_domain": "Healthcare",
- "search_fields": "patient, signs_date",
+ "search_fields": "patient, signs_date,uid",
  "show_name_in_global_search": 1,
  "sort_field": "modified",
  "sort_order": "DESC",

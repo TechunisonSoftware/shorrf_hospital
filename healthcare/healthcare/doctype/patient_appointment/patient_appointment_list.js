@@ -1,7 +1,7 @@
 /*
 (c) ESS 2015-16
 */
-frappe.listview_settings["Patient Appointment"] = {
+frappe.listview_settings['Patient Appointment'] = {
 	filters: [["status", "=", "Open"]],
 	get_indicator: function(doc) {
 		var colors = {
@@ -11,9 +11,7 @@ frappe.listview_settings["Patient Appointment"] = {
 			"Cancelled": "red",
 			"Expired": "grey",
 			"Checked In": "blue",
-			"Checked Out": "orange",
-			"Confirmed": "green",
-			"No Show": "red"
+			"Checked Out": "orange"
 		};
 		return [__(doc.status), colors[doc.status], "status,=," + doc.status];
 	}

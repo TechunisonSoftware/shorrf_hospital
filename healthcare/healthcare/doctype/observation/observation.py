@@ -8,11 +8,15 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.model.workflow import get_workflow_name, get_workflow_state_field
-from frappe.utils import flt, get_link_to_form, getdate, now_datetime, nowdate
+from frappe.utils import now_datetime
+from frappe.utils.password import get_decrypted_password
 
 from erpnext.setup.doctype.terms_and_conditions.terms_and_conditions import (
 	get_terms_and_conditions,
 )
+from datetime import datetime
+import requests
+from requests.auth import HTTPBasicAuth
 
 
 class Observation(Document):
@@ -25,21 +29,114 @@ class Observation(Document):
 
 	def on_update(self):
 		set_diagnostic_report_status(self)
-		if (
-			self.parent_observation
-			and self.result_data
-			and self.permitted_data_type in ["Quantity", "Numeric"]
-		):
-			set_calculated_result(self)
 
 	def before_insert(self):
 		set_observation_idx(self)
 
 	def on_submit(self):
+		# print("____________________________________________________________________________")
 		if self.service_request:
 			frappe.db.set_value(
 				"Service Request", self.service_request, "status", "completed-Request Status"
 			)
+		# print("Before if")			
+		if self.observation_category == "Imaging":
+			# print("inside if")
+			required_fields = ['patient_uid','patient_name','gender','practitioner_name','practitioner_department','observation_template','name','patient','patient_dob','posting_datetime','reference_docname','service_request','practitioner_mobile','preferred_display_name']
+			specific_fields = {field: self.as_dict().get(field) for field in required_fields}			
+			patient_uid = specific_fields.get("patient_uid")				
+			patient = specific_fields.get("patient")
+			patient_name = specific_fields.get("patient_name")
+			dob = specific_fields.get("patient_dob")
+			gender = specific_fields.get("gender") 
+			patient_encounter_id = specific_fields.get("reference_docname")
+			patientAddress = ""
+			service_unit_value = ""
+			service_unit = ""
+			if patient_uid:		
+				patient_address = frappe.get_all(
+				"Address",
+				filters={
+					"link_doctype": "Patient",
+					"link_name": patient
+				},
+				fields=["address_line1","address_line2","city","state","country","pincode"]		)	
+				print(patient_address)	
+				if patient_address:				
+					formatted_address = format_patient_address(patient_address)				
+					patientAddress = formatted_address		
+				patient_data = {
+					"patientId":patient_uid,
+					"patientName":patient_name,
+					"dob":dob,
+					"gender":gender,
+					"patientAddress":patientAddress 
+				}			
+				order_number = specific_fields.get("name")
+				order_datetime = specific_fields.get("posting_datetime")
+				modality = specific_fields.get("preferred_display_name")
+				service_request_id = specific_fields.get("service_request")
+				datetime_obj = datetime.strptime(order_datetime, "%Y-%m-%d %H:%M:%S.%f")
+				formatted_datetime = datetime_obj.strftime("%Y%m%d%H%M")             
+				doctor_name = specific_fields.get("practitioner_name")
+				doctor_department = specific_fields.get("practitioner_department")
+				call_back_number = specific_fields.get('practitioner_mobile')
+				datetime_of_order = formatted_datetime
+				observation_template = specific_fields.get("observation_template")
+				patient_encounter = frappe.get_doc("Patient Encounter", patient_encounter_id)
+				inpatient_record_id = patient_encounter.inpatient_record
+				patient_appointment_id = patient_encounter.appointment			
+				scheduled_procedure =""			
+				if inpatient_record_id:			
+					inpatient_record = frappe.get_doc("Inpatient Record", inpatient_record_id)				
+					for occupancy in inpatient_record.inpatient_occupancies:
+							
+						healthcare_service_unit = occupancy.service_unit
+						healthcare_service_unit_doc = frappe.get_doc("Healthcare Service Unit", healthcare_service_unit)
+						parent_service_unit = healthcare_service_unit_doc.parent_healthcare_service_unit
+							
+						if parent_service_unit == "General Ward":
+							service_unit = "GW"	
+						elif parent_service_unit == "ICU Ward":
+							service_unit = "ICU"	
+						elif parent_service_unit == "Special Ward":
+							service_unit = "SPl"	
+						elif parent_service_unit == "NICU Ward":
+							service_unit = "NIC"
+						elif parent_service_unit == "Emergency Ward":
+							service_unit = "EMW"
+						else:
+							service_unit = "IP"
+				else:
+					patient_appointment_service_unit = frappe.db.get_value(
+						"Patient Appointment", 
+						filters={"name": patient_appointment_id}, 
+						fieldname=["service_unit"]
+					)				
+					service_unit_value = patient_appointment_service_unit
+					if service_unit_value:
+						service_unit = "OP"			
+				
+				for radiology in patient_encounter.radiology:
+					if radiology.service_request == service_request_id:            
+						scheduled_procedure= radiology.schedule_procedure
+				
+				request_body = {
+					"patient" : patient_data,
+					"patientClass" : service_unit,
+					"treatingDoctor" : doctor_name,
+					"referringDoctor" : doctor_name,
+					"treatingDepartment":doctor_department,
+					"orderNumber":order_number,
+					"dateTimeofOrder":datetime_of_order,
+					"callBackPhoneNumber":call_back_number,
+					"modality":modality,
+					"scheduledProcedure":scheduled_procedure
+
+				}
+				# print(request_body)
+				# print("**********************************************************************************")
+				request_to_modality(request_body,self)	
 
 	def on_cancel(self):
 		if self.service_request:
@@ -192,7 +289,7 @@ def get_child_observations(obs):
 	)
 
 
-def return_child_observation_data_as_dict(child_observations, obs, obs_length=0):
+def return_child_observation_data_as_dict(child_observations, obs, obs_length):
 	obs_list = []
 	has_result = False
 	obs_approved = False
@@ -491,147 +588,80 @@ def set_diagnostic_report_status(doc):
 			)
 
 
-def set_calculated_result(doc):
-	if doc.parent_observation:
-		parent_template = frappe.db.get_value(
-			"Observation", doc.parent_observation, "observation_template"
-		)
-		parent_template_doc = frappe.get_cached_doc("Observation Template", parent_template)
+def format_patient_address(address_list):
+    if not address_list:
+        return   
+    
+    address = address_list[0]   
+    
+    patient_address = " ".join(
+        str(address.get(key, "")).strip() for key in [
+            "address_line1", "address_line2", "city", "state", "country", "pincode"
+        ] if address.get(key)
+    )
+    return patient_address
 
-		data = frappe._dict()
-		patient_doc = frappe.get_cached_doc("Patient", doc.patient).as_dict()
-		settings = frappe.get_cached_doc("Healthcare Settings").as_dict()
+def request_to_modality(request_body, self):
+    credentials = frappe.get_doc("Radiology Setting")
+    url = credentials.mirth_connect_url
+    username = credentials.authenticate_user
+    password = get_decrypted_password("Radiology Setting", credentials.name, "authenticate_password")
+    headers = {"Content-Type": "application/json"}
+    api_url = f"{url}/mwlserver/"
+    
 
-		data.update(doc.as_dict())
-		data.update(parent_template_doc.as_dict())
-		data.update(patient_doc)
-		data.update(settings)
+    try:
+        response = requests.post(
+            api_url,
+            json=request_body,
+            headers=headers,
+            auth=HTTPBasicAuth(username, password)
+        )
 
-		for component in parent_template_doc.observation_component:
-			"""
-			Data retrieval from observations has been moved into the loop
-			to accommodate component observations, which may contain formulas
-			utilizing results from previous iterations.
+        if response.status_code == 200:
+            frappe.logger().info("API Request successful")
+            frappe.msgprint(_("Radiology order sent successfully"))
+            create_radiology_report_entry(self, request_body)  # Fixed indentation
+            return response.json()
+        else:
+            
+            frappe.logger().error(f"API Request failed with status code {response.status_code}")
+            frappe.logger().error(f"Response: {response.text}")
+            frappe.msgprint(_(f"API Request failed with status code {response.status_code}"))
+            return None
+    except requests.exceptions.RequestException as e:
+        frappe.logger().error(f"An error occurred during the API request: {e}")
+        frappe.msgprint(_(f"An error occurred during the API request: {e}"))
+        return None
 
-			"""
-			if component.based_on_formula and component.formula:
-				obs_data = get_data(doc, parent_template_doc)
-			else:
-				continue
-
-			if obs_data and len(obs_data) > 0:
-				data.update(obs_data)
-				result = eval_condition_and_formula(component, data)
-				if not result:
-					continue
-
-				result_observation_name, result_data = frappe.db.get_value(
-					"Observation",
-					{
-						"parent_observation": doc.parent_observation,
-						"observation_template": component.get("observation_template"),
-					},
-					["name", "result_data"],
-				)
-				if result_observation_name and result_data != str(result):
-					frappe.db.set_value(
-						"Observation",
-						result_observation_name,
-						"result_data",
-						str(result),
-					)
-
-
-def get_data(doc, parent_template_doc):
-	data = frappe._dict()
-	observation_details = frappe.get_all(
-		"Observation",
-		{"parent_observation": doc.parent_observation},
-		["observation_template", "result_data"],
-	)
-
-	# to get all result_data to map against abbs of all table rows
-	for component in parent_template_doc.observation_component:
-		result = [
-			d["result_data"]
-			for d in observation_details
-			if (d["observation_template"] == component.get("observation_template") and d["result_data"])
-		]
-		data[component.get("abbr")] = flt(result[0]) if (result and len(result) > 0 and result[0]) else 0
-	return data
-
-
-def eval_condition_and_formula(d, data):
-	try:
-		if d.get("condition"):
-			cond = d.get("condition")
-			parts = cond.strip().splitlines()
-			condition = " ".join(parts)
-			if condition:
-				if not frappe.safe_eval(condition, data):
-					return None
-
-		if d.based_on_formula:
-			amount = None
-			formula = d.formula.strip().replace("\n", " ") if d.formula else None
-			operands = re.split(r"\W+", formula)
-			abbrs = [operand for operand in operands if re.search(r"[a-zA-Z]", operand)]
-			if "age" in abbrs and data.get("dob"):
-				age = (
-					getdate(nowdate()).year
-					- data.get("dob").year
-					- (
-						(getdate(nowdate()).month, getdate(nowdate()).day)
-						< (data.get("dob").month, data.get("dob").day)
-					)
-				)
-				if age > 0:
-					data["age"] = age
-
-			# check the formula abbrs has result value
-			abbrs_present = all(abbr in data and data[abbr] != 0 for abbr in abbrs)
-			if formula and abbrs_present:
-				amount = flt(frappe.safe_eval(formula, {}, data))
-
-		return amount
-
-	except Exception as err:
-		description = _("This error can be due to invalid formula.")
-		message = _(
-			"""Error while evaluating the {0} {1} at row {2}. <br><br> <b>Error:</b> {3}
-			<br><br> <b>Hint:</b> {4}"""
-		).format(d.parenttype, get_link_to_form(d.parenttype, d.parent), d.idx, err, description)
-		frappe.throw(message, title=_("Error in formula"))
-
-
-def get_observations_for_medical_record(observation, parent_observation=None):
-	if not observation:
-		return
-
-	if parent_observation:
-		obs_doc = frappe.get_doc("Observation", parent_observation)
-	else:
-		obs_doc = frappe.get_doc("Observation", observation)
-
-	obs_doc = obs_doc.as_dict()
-	out_data = []
-
-	if not obs_doc.get("has_component"):
-		if obs_doc.get("permitted_data_type") == "Select" and obs_doc.get("options"):
-			obs_doc["options_list"] = obs_doc.get("options").split("\n")
-
-		if obs_doc.get("observation_template") and obs_doc.get("specimen"):
-			obs_doc["received_time"] = frappe.get_value(
-				"Specimen", obs_doc.get("specimen"), "received_time"
-			)
-
-		out_data.append({"observation": obs_doc})
-
-	else:
-		child_observations = get_child_observations(obs_doc)
-		obs_dict = return_child_observation_data_as_dict(child_observations, obs_doc)
-
-		if len(obs_dict) > 0:
-			out_data.append(obs_dict)
-
-	return out_data
+	
+def create_radiology_report_entry(doc,request_body):
+   
+    existing_radiology_report = frappe.get_all(
+        "Radiology Result Entry",
+        filters={"observation": doc.name},
+        limit=1
+    ) 
+   
+    if not existing_radiology_report:      
+        radiology_result_entry_doc = frappe.get_doc({
+            "doctype": "Radiology Result Entry",
+            "observation": doc.name,  
+            "observation_template": doc.observation_template,        
+            "observation_category": doc.observation_category,
+            "schedule_procedure":request_body["scheduledProcedure"],
+            "age":doc.age,
+            "company":doc.company,
+            "posting_datetime": doc.posting_datetime,
+            "status": 'Open',               
+            "medical_department": doc.medical_department, 
+            "patient": doc.patient, 
+            "referred_practitioner": doc.healthcare_practitioner,                   
+			# "reference_doctype":doc.reference_doctype,
+            "patient_encounter":doc.reference_docname,
+            "service_request":doc.service_request,
+            "docstatus": 0 
+		})     
+     
+        radiology_result_entry_doc.insert(ignore_permissions=True,ignore_mandatory=True)
+        frappe.db.commit()

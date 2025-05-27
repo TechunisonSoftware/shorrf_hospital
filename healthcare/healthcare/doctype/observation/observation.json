@@ -13,24 +13,29 @@
   "naming_series",
   "observation_template",
   "observation_category",
+  "preferred_display_name",
   "column_break_7xu5",
   "company",
-  "posting_date",
+  "posting_datetime",
   "status",
   "medical_department",
   "amended_from",
   "section_break_i70a",
   "patient",
   "patient_name",
+  "patient_uid",
   "column_break_qxq5",
+  "patient_dob",
   "age",
   "gender",
   "section_break_zz5k",
   "healthcare_practitioner",
   "practitioner_name",
+  "column_break_hnbu",
+  "practitioner_department",
+  "practitioner_mobile",
   "template_details_section",
   "has_component",
-  "preferred_display_name",
   "sample_collection_required",
   "permitted_unit",
   "column_break_pxgu",
@@ -135,7 +140,7 @@
    "fieldname": "naming_series",
    "fieldtype": "Select",
    "label": "Naming",
-   "options": "HLC-OBS-.YYYY.-",
+   "options": "OBS.YY.-",
    "set_only_once": 1
   },
   {
@@ -150,6 +155,7 @@
    "options": "Codification Table"
   },
   {
+   "fetch_from": "patient.patient_age",
    "fieldname": "age",
    "fieldtype": "Data",
    "label": "Age",
@@ -160,7 +166,8 @@
    "fieldname": "gender",
    "fieldtype": "Link",
    "label": "Gender",
-   "options": "Gender"
+   "options": "Gender",
+   "read_only": 1
   },
   {
    "fieldname": "section_break_i70a",
@@ -222,7 +229,8 @@
    "fetch_from": "patient.patient_name",
    "fieldname": "patient_name",
    "fieldtype": "Data",
-   "label": "Patient Name"
+   "label": "Patient Name",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_wwnp",
@@ -546,13 +554,6 @@
    "read_only": 1
   },
   {
-   "default": "Today",
-   "fieldname": "posting_date",
-   "fieldtype": "Date",
-   "label": "Posting Date",
-   "read_only": 1
-  },
-  {
    "fieldname": "sales_invoice_item",
    "fieldtype": "Data",
    "label": "Sales Invoice Item",
@@ -564,12 +565,51 @@
    "fieldtype": "Check",
    "label": "Invoiced",
    "read_only": 1
+  },
+  {
+   "fetch_from": "patient.uid",
+   "fieldname": "patient_uid",
+   "fieldtype": "Data",
+   "label": "Patient UID",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "patient.dob",
+   "fieldname": "patient_dob",
+   "fieldtype": "Date",
+   "label": "Patient DOB",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_hnbu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "healthcare_practitioner.department",
+   "fieldname": "practitioner_department",
+   "fieldtype": "Data",
+   "label": "Practitioner Department",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "healthcare_practitioner.mobile_phone",
+   "fieldname": "practitioner_mobile",
+   "fieldtype": "Data",
+   "label": "Practitioner Mobile",
+   "read_only": 1
+  },
+  {
+   "default": "Today",
+   "fieldname": "posting_datetime",
+   "fieldtype": "Datetime",
+   "label": "Posting Date",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-10-25 06:00:59.016090",
+ "modified": "2025-03-26 11:02:25.673763",
  "modified_by": "Administrator",
  "module": "Healthcare",
  "name": "Observation",

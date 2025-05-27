@@ -7,6 +7,7 @@ frappe.ui.form.on('Patient Appointment', {
 			'Vital Signs': 'Vital Signs',
 			'Patient Encounter': 'Patient Encounter'
 		};
+
 	},
 
 	onload: function(frm) {
@@ -14,20 +15,53 @@ frappe.ui.form.on('Patient Appointment', {
 			frm.set_value('appointment_time', null);
 			frm.disable_save();
 		}
+		healthcare.utils.set_company_if_local(frm);
+		// frm.fields_dict.patient.get_query = function() {
+        //     if (frm.doc.company) {
+        //         return {
+        //             filters: {
+        //                 company: frm.doc.company
+        //             }
+        //         };
+        //     }
+        // };
+		
 	},
 
 	refresh: function(frm) {
+		if (frm.doc.google_meet_link) {
+             frm.add_custom_button('Tele Consultation', function() {
+                window.open(frm.doc.google_meet_link, '_blank');
+            }).css({'background-color':"#C1E1C1",'color':'#16794C'});
+            
+        }
 		frm.set_query('patient', function() {
+			if (frm.doc.company) {
+			return {
+				filters: { 'status': 'Active' ,'company': frm.doc.company}
+			};
+		}else{
 			return {
 				filters: { 'status': 'Active' }
 			};
+		}
 		});
 
+		
+
 		frm.set_query('practitioner', function() {
+
 			if (frm.doc.department) {
 				return {
 					filters: {
 						'department': frm.doc.department
+					}
+				};
+			}
+			if (frm.doc.company) {
+				return {
+					filters: {
+						'company': frm.doc.company
 					}
 				};
 			}
@@ -81,7 +115,7 @@ frappe.ui.form.on('Patient Appointment', {
 			}, __('View'));
 		}
 
-		if (["Open", "Checked In", "Confirmed"].includes(frm.doc.status) || (frm.doc.status == "Scheduled" && !frm.doc.__islocal)) {
+		if (["Open", "Checked In"].includes(frm.doc.status) || (frm.doc.status == 'Scheduled' && !frm.doc.__islocal)) {
 			frm.add_custom_button(__('Cancel'), function() {
 				update_status(frm, 'Cancelled');
 			});
@@ -115,17 +149,10 @@ frappe.ui.form.on('Patient Appointment', {
 			frm.add_custom_button(__('Vital Signs'), function() {
 				create_vital_signs(frm);
 			}, __('Create'));
-
-			if (["Open", "Scheduled"].includes(frm.doc.status)) {
-				frm.add_custom_button(__("Confirm"), function() {
-					frm.set_value("status", "Confirmed");
-					frm.save();
-				}, __("Status"));
-			}
 		}
 
-		if (!frm.doc.__islocal && ["Open", "Confirmed"].includes(frm.doc.status) && frm.doc.appointment_based_on_check_in) {
-			frm.add_custom_button(__("Check In"), () => {
+		if (!frm.doc.__islocal && frm.doc.status=="Open" && frm.doc.appointment_based_on_check_in) {
+			frm.add_custom_button(__('Check In'), () => {
 				frm.set_value("status", "Checked In");
 				frm.save();
 			});
@@ -393,110 +420,138 @@ let check_and_set_availability = function(frm) {
 		});
 	}
 
-	function show_availability() {
-		let selected_practitioner = '';
-		let d = new frappe.ui.Dialog({
-			title: __('Available slots'),
-			fields: [
-				{ fieldtype: 'Link', options: 'Medical Department', reqd: 1, fieldname: 'department', label: 'Medical Department' },
-				{ fieldtype: 'Column Break' },
-				{ fieldtype: 'Link', options: 'Healthcare Practitioner', reqd: 1, fieldname: 'practitioner', label: 'Healthcare Practitioner' },
-				{ fieldtype: 'Column Break' },
-				{ fieldtype: 'Date', reqd: 1, fieldname: 'appointment_date', label: 'Date', min_date: new Date(frappe.datetime.get_today()) },
-				{ fieldtype: 'Section Break' },
-				{ fieldtype: 'HTML', fieldname: 'available_slots' },
-			],
-			primary_action_label: __('Book'),
-			primary_action: async function() {
-				frm.set_value('appointment_time', selected_slot);
-				add_video_conferencing = add_video_conferencing && !d.$wrapper.find(".opt-out-check").is(":checked")
-					&& !overlap_appointments
 
-				frm.set_value('add_video_conferencing', add_video_conferencing);
-				if (!frm.doc.duration) {
-					frm.set_value('duration', duration);
-				}
-				let practitioner = frm.doc.practitioner;
 
-				frm.set_value('practitioner', d.get_value('practitioner'));
-				frm.set_value('department', d.get_value('department'));
-				frm.set_value('appointment_date', d.get_value('appointment_date'));
-				frm.set_value('appointment_based_on_check_in', appointment_based_on_check_in)
 
-				if (service_unit) {
-					frm.set_value('service_unit', service_unit);
-				}
+async function show_availability() {
+	console.log("show_availability");
 
-				d.hide();
-				frm.enable_save();
-				await frm.save();
-				if (!frm.is_new() && (!practitioner || practitioner == d.get_value('practitioner'))) {
-					await frappe.db.get_single_value("Healthcare Settings", "show_payment_popup").then(val => {
-						frappe.call({
-							method: "healthcare.healthcare.doctype.fee_validity.fee_validity.check_fee_validity",
-							args: { "appointment": frm.doc },
-							callback: (r) => {
-								if (val && !r.message && !frm.doc.invoiced) {
-									make_payment(frm, val);
-								} else {
-									frappe.call({
-										method: "healthcare.healthcare.doctype.patient_appointment.patient_appointment.update_fee_validity",
-										args: { "appointment": frm.doc }
-									});
-								}
+	let selected_practitioner = '';
+	let selected_department = frm.doc.department;
+
+	let d = new frappe.ui.Dialog({
+		title: __('Available slots'),
+		fields: [
+			{ fieldtype: 'Link', options: 'Medical Department', reqd: 1, fieldname: 'department', label: 'Medical Department' },
+			{ fieldtype: 'Column Break' },
+			{ fieldtype: 'Link', options: 'Healthcare Practitioner', reqd: 1, fieldname: 'practitioner', label: 'Healthcare Practitioner' },
+			{ fieldtype: 'Column Break' },
+			{ fieldtype: 'Date', reqd: 1, fieldname: 'appointment_date', label: 'Date', min_date: new Date(frappe.datetime.get_today()) },
+			{ fieldtype: 'Section Break' },
+			{ fieldtype: 'HTML', fieldname: 'available_slots' },
+		],
+		primary_action_label: __('Book'),
+		primary_action: async function () {
+			frm.set_value('appointment_time', selected_slot);
+			// add_video_conferencing = add_video_conferencing && !d.$wrapper.find(".opt-out-check").is(":checked") && !overlap_appointments;
+
+			// frm.set_value('add_video_conferencing', add_video_conferencing);
+
+			if (!frm.doc.duration) {
+				frm.set_value('duration', duration);
+			}
+
+			let practitioner = frm.doc.practitioner;
+
+			frm.set_value('practitioner', d.get_value('practitioner'));
+			frm.set_value('department', d.get_value('department'));
+			frm.set_value('appointment_date', d.get_value('appointment_date'));
+			frm.set_value('appointment_based_on_check_in', appointment_based_on_check_in);
+
+			if (service_unit) {
+				frm.set_value('service_unit', service_unit);
+			}
+
+			d.hide();
+			frm.enable_save();
+			await frm.save();
+
+			if (!frm.is_new() && (!practitioner || practitioner == d.get_value('practitioner'))) {
+				await frappe.db.get_single_value("Healthcare Settings", "show_payment_popup").then(val => {
+					frappe.call({
+						method: "healthcare.healthcare.doctype.fee_validity.fee_validity.check_fee_validity",
+						args: { "appointment": frm.doc },
+						callback: (r) => {
+							if (val && !r.message && !frm.doc.invoiced) {
+								make_payment(frm, val);
+							} else {
+								frappe.call({
+									method: "healthcare.healthcare.doctype.patient_appointment.patient_appointment.update_fee_validity",
+									args: { "appointment": frm.doc }
+								});
 							}
-						});
-					});
-				}
-				d.get_primary_btn().attr('disabled', true);
-			}
-		});
-
-		d.set_values({
-			'department': frm.doc.department,
-			'practitioner': frm.doc.practitioner,
-			'appointment_date': frm.doc.appointment_date,
-		});
-
-		let selected_department = frm.doc.department;
-
-		d.fields_dict['department'].df.onchange = () => {
-			if (selected_department != d.get_value('department')) {
-				d.set_values({
-					'practitioner': ''
-				});
-				selected_department = d.get_value('department');
-			}
-			if (d.get_value('department')) {
-				d.fields_dict.practitioner.get_query = function() {
-					return {
-						filters: {
-							'department': selected_department
 						}
-					};
-				};
+					});
+				});
 			}
-		};
 
-		// disable dialog action initially
-		d.get_primary_btn().attr('disabled', true);
+			d.get_primary_btn().attr('disabled', true);
+		}
+	});
 
-		// Field Change Handler
+	d.set_values({
+		'department': frm.doc.department,
+		'practitioner': frm.doc.practitioner,
+		'appointment_date': frm.doc.appointment_date,
+	});
 
-		let fd = d.fields_dict;
+	// Setup onchange for department (clears practitioner only if manually changed)
+	d.fields_dict['department'].df.onchange = () => {
+		let current_department = d.get_value('department');
+		if (selected_department !== current_department) {
+			selected_department = current_department;
+			d.set_value('practitioner', '');
 
-		d.fields_dict['appointment_date'].df.onchange = () => {
-			show_slots(d, fd);
-		};
-		d.fields_dict['practitioner'].df.onchange = () => {
-			if (d.get_value('practitioner') && d.get_value('practitioner') != selected_practitioner) {
-				selected_practitioner = d.get_value('practitioner');
-				show_slots(d, fd);
+			if (current_department) {
+				d.fields_dict['practitioner'].get_query = () => ({
+					filters: { 'department': current_department },
+					ignore_user_permissions: 1
+				});
 			}
-		};
+		}
+	};
 
-		d.show();
-	}
+	d.fields_dict['appointment_date'].df.onchange = () => {
+		show_slots(d, d.fields_dict);
+	};
+
+	d.fields_dict['practitioner'].df.onchange = async () => {
+		console.log("practitioner changed");
+		let practitioner = d.get_value('practitioner');
+
+		if (practitioner && practitioner !== selected_practitioner) {
+			selected_practitioner = practitioner;
+
+			if (!d.get_value('department')) {
+				let r = await frappe.call({
+					method: "healthcare.healthcare.doctype.patient_appointment.patient_appointment.get_practitioner_department",
+					args: { practitioner }
+				});
+
+				if (r.message) {
+					// Temporarily disable department onchange
+					let dept_field = d.fields_dict['department'];
+					let original_onchange = dept_field.df.onchange;
+					dept_field.df.onchange = null;
+
+					await d.set_value('department', r.message);
+
+					dept_field.df.onchange = original_onchange;
+					selected_department = r.message;
+				}
+			}
+
+			show_slots(d, d.fields_dict);
+		}
+	};
+
+	d.get_primary_btn().attr('disabled', true);
+	d.show();
+}
+
+
+
+	
 
 	function show_slots(d, fd) {
 		if (d.get_value('appointment_date') && d.get_value('practitioner')) {

@@ -14,7 +14,7 @@ def get_data():
 				"label": _("Appointments and Encounters"),
 				"items": ["Patient Appointment", "Vital Signs", "Patient Encounter"],
 			},
-			{"label": _("Lab Tests and Vital Signs"), "items": ["Lab Test", "Sample Collection"]},
+			{"label": _("Lab Tests and Vital Signs"), "items": ["Lab Test", "Sample Collection","Radiology Result Entry"]},
 			{
 				"label": _("Rehab and Physiotherapy"),
 				"items": ["Patient Assessment", "Therapy Session", "Therapy Plan"],
@@ -22,5 +22,7 @@ def get_data():
 			{"label": _("Surgery"), "items": ["Clinical Procedure"]},
 			{"label": _("Admissions"), "items": ["Inpatient Record", "Inpatient Medication Order"]},
 			{"label": _("Billing and Payments"), "items": ["Sales Invoice", "Payment Entry"]},
+   			{"label": _("One Million Scan's"), "items": ["One Million Scan"]},
+            {"label": _("Patient Profiling"), "items": ["Patient Profiling"]}
 		],
 	}
