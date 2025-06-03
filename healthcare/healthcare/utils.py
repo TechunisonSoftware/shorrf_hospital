@@ -682,12 +682,12 @@ def get_drugs_to_invoice(encounter, customer, link_customer=False):
 		if patient:
 			orders_to_invoice = []
 			medication_requests = frappe.get_list(
-				"Pharmacy Prescription",
+				"Medication Request",
 				fields=["*"],
 				filters={
 					"patient": patient.name,
 					"order_group": encounter.name,
-					"billing_status": ["in", ["Dispensed", "Partly Dispensed"]],
+					"billing_status": ["in", ["Pending", "Partly Invoiced"]],
 					"docstatus": 1,
 				},
 			)
