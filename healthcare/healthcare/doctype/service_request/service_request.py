@@ -69,7 +69,7 @@ class ServiceRequest(ServiceRequestController):
 		if not self.priority:
 			self.priority = frappe.db.get_single_value("Healthcare Settings", "default_priority")
 
-	def update_invoice_details(self, qty):
+	def update_invoice_details(self, qty,sales_id):
 		"""
 		updates qty_invoiced and set  billing status
 		"""
@@ -83,7 +83,7 @@ class ServiceRequest(ServiceRequestController):
 			invoiced = 1
 			status = "Invoiced"
 
-		self.db_set({"qty_invoiced": qty_invoiced, "billing_status": status})
+		self.db_set({"qty_invoiced": qty_invoiced, "billing_status": status,"sales_invoice": sales_id})
 		if self.template_dt == "Lab Test Template":
 			dt = "Lab Test"
 		elif self.template_dt == "Clinical Procedure Template":

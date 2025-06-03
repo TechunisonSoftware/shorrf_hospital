@@ -129,3 +129,23 @@ def update_dispensed_amount(row_name, new_dispensed_amount):
     doc.save()
     frappe.db.commit()
     return "Updated"
+
+@frappe.whitelist()
+def get_item_rate(item_code):
+    """Fetch price rate of an item from Item Price or Item master"""
+    if not item_code:
+        return 0
+    
+    print("Item code ",item_code)
+ 
+    # First try Item Price (Selling)
+    price = frappe.get_value("Item Price", {
+        "item_code": item_code,
+        "selling": 1
+    }, "price_list_rate")
+ 
+    # If not found, fallback to Item master 'standard_rate'
+    if price is None:
+        price = frappe.get_value("Item", item_code, "standard_rate")
+ 
+    return price or 0

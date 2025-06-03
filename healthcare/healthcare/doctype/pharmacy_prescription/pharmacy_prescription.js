@@ -146,12 +146,12 @@ function process_medication(frm, button) {
             
                     selected_items.push({
                         item: row.medication,
-                        source_warehouse: `Pharmacy Counter - ${company_abbreviation}`,
-                        target_warehouse: `Dispensed to Patient - ${company_abbreviation}`,
+                        source_warehouse: `Stores - ${company_abbreviation}`,
+                        target_warehouse: `Work In Progress - ${company_abbreviation}`,
                         quantity: row.dispensed_amount || r.message || 0,
-                        // available_stock: 0,
-                        available_stock: r.message,             //CHANGED LINE 
+                        available_stock: r.message,
                         row_name: row.name,
+                        rate:row.rate,
                         medication_request: row.medication_request  
                     });
                     resolve();
@@ -166,22 +166,39 @@ function process_medication(frm, button) {
             return;
         }
 
-        let fields = selected_items.flatMap(item => [
+        let fields = selected_items.map((item , index)=> [
             { fieldtype: 'Section Break', label: `Medication: ${item.item}` },
-            { fieldtype: 'Link', fieldname: `item_${item.row_name}`, label: 'Item', options: 'Item', reqd: 1, default: item.item },
-            { 
-                fieldtype: 'Link', fieldname: `source_warehouse_${item.row_name}`, label: 'Source Warehouse', 
-                options: 'Warehouse', reqd: 1, default: item.source_warehouse, 
+            { fieldtype: 'Link', fieldname: `item_${item.row_name}`, label: 'Item', options: 'Item', reqd: 1, default: item.item},
+            { fieldtype: 'Column Break' },
+            {
+                fieldtype: 'Link', fieldname: `source_warehouse_${item.row_name}`, label: 'Source Warehouse',
+                options: 'Warehouse', reqd: 1, default: item.source_warehouse,
                 change: function () {
                     let warehouse = dialog.get_value(`source_warehouse_${item.row_name}`);
                     fetch_available_stock(item.item, warehouse, item.row_name);
                 }
             },
-            { fieldtype: 'Link', fieldname: `target_warehouse_${item.row_name}`, label: 'Target Warehouse', options: 'Warehouse', reqd: 1, default: item.target_warehouse },
-            { fieldtype: 'Read Only', fieldname: `quantity_${item.row_name}`, label: 'Quantity', reqd: 1, default: item.quantity },
+            // { fieldtype: 'Column Break' },
+            { fieldtype: 'Link', fieldname: `target_warehouse_${item.row_name}`, label: 'Target Warehouse', options: 'Warehouse',reqd: 1, default: item.target_warehouse },
+            { fieldtype: 'Column Break' },
+            { fieldtype: 'Float', fieldname: `quantity_${item.row_name}`, label: 'Quantity', reqd: 1,default: item.quantity ,change: () => {
+                let qty = dialog.get_value(`quantity_${item.row_name}`);
+                fetch_item_rate(item.item, item.row_name, qty, index);
+            }},
+            
+            { fieldtype: 'Column Break' },
+            { fieldtype: 'Currency', fieldname: `rate_${item.row_name}`, label: 'Rate (as per)', default: item.rate, read_only: 1 },
+            { fieldtype: 'Column Break' },
+            { fieldtype: 'Currency', fieldname: `total_${item.row_name}`, label: 'Total', default: item.total, read_only: 1  },
+            { fieldtype: 'Column Break' },
             { fieldtype: 'Read Only', fieldname: `available_stock_${item.row_name}`, label: 'Available Stock', default: item.available_stock },
-        ]);
-
+        ]).flat();
+        fields.push(
+            { fieldtype: 'Section Break' },
+            { fieldtype: 'Currency', fieldname: 'grand_total', label: 'Grand Total', read_only: 1, default: 0 }
+        );
+ 
+ 
         let dialog = new frappe.ui.Dialog({
             title: 'Dispense Medication',
             fields: fields,
@@ -268,9 +285,12 @@ function process_medication(frm, button) {
 
         dialog.show();
 
-        selected_items.forEach(item => {
-            fetch_available_stock(item.item, item.source_warehouse, item.row_name);
+        selected_items.forEach((item , index)=> {
+            console.log(`Calling fetch for item ${index}: ${item.item}`);
+            
             dialog.set_value(`quantity_${item.row_name}`, item.quantity);
+            fetch_item_rate(item.item, item.row_name, item.quantity, index);
+            fetch_available_stock(item.item, item.source_warehouse, item.row_name);
         });
 
         function fetch_available_stock(item_code, warehouse, row_name) {
@@ -283,6 +303,31 @@ function process_medication(frm, button) {
                 },
                 callback(r) {
                     dialog.set_value(`available_stock_${row_name}`, r.message || 0);
+                }
+            });
+        }
+        // Initialize an array to hold totals for each item, length = selected_items.length
+        let totalsArray = new Array(selected_items.length).fill(0);
+ 
+        function fetch_item_rate(item_code, row_name, quantity, index) {
+            frappe.call({
+                method: 'healthcare.healthcare.doctype.pharmacy_prescription.pharmacy_prescription.get_item_rate',
+                args: { item_code },
+                callback(rate_response) {
+                    let rate = rate_response.message || 0;
+                    dialog.set_value(`rate_${row_name}`, rate);
+ 
+                    let total = rate * quantity;
+                    dialog.set_value(`total_${row_name}`, total);
+ 
+                    // Store total in array at correct index
+                    totalsArray[index] = total;
+ 
+                    // Now calculate grand total by summing the array
+                    let grand_total = totalsArray.reduce((acc, val) => acc + val, 0);
+                    dialog.set_value('grand_total', grand_total);
+ 
+                    console.log(`Updated grand total: ${grand_total}`);
                 }
             });
         }

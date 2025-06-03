@@ -55,25 +55,36 @@ frappe.ui.form.on('Service Request', {
 
 
 		} else if (frm.doc.template_dt === 'Lab Test Template') {
-			frm.add_custom_button(__('Lab Test'), function() {
-				frappe.db.get_value("Lab Test", {"service_request": frm.doc.name, "docstatus":["!=", 2]}, "name")
-				.then(r => {
-					if (Object.keys(r.message).length == 0) {
-						frm.trigger('make_lab_test');
-					} else {
-						if (r.message && r.message.name) {
-							frappe.set_route("Form", "Lab Test", r.message.name);
-							frappe.show_alert({
-								message: __(`Lab Test is already created`),
-								indicator: "info",
-							});
-						}
-					}
-				})
-			}, __('Create'));
-
-
-		} else if (frm.doc.template_dt === 'Therapy Type') {
+            if (frm.doc.sales_invoice) {
+                frappe.db.get_value("Sales Invoice", frm.doc.sales_invoice, "status")
+                .then(r => {
+                    if (r.message.status === "Paid") {
+                        frm.add_custom_button(__('Lab Test'), function () {
+                            frappe.db.get_value("Lab Test", {
+                                "service_request": frm.doc.name,
+                                "docstatus": ["!=", 2]
+                            }, "name").then(r => {
+                                if (Object.keys(r.message).length === 0) {
+                                    frm.trigger('make_lab_test');
+                                } else if (r.message && r.message.name) {
+                                    frappe.set_route("Form", "Lab Test", r.message.name);
+                                    frappe.show_alert({
+                                        message: __(`Lab Test is already created`),
+                                        indicator: "info",
+                                    });
+                                }
+                            });
+                        }, __('Create'));
+                    }
+                    else {
+                        frappe.msgprint("Service Request need to be <b>Paid</b> before proceeding");
+                    }
+                });
+            }
+            else {
+                frappe.msgprint("Service Request need to be <b>invoiced</b> before proceeding");
+            }
+        } else if (frm.doc.template_dt === 'Therapy Type') {
 			frm.add_custom_button(__("Therapy Session"), function() {
 				frappe.db.get_value("Therapy Session", {"service_request": frm.doc.name, "docstatus":["!=", 2]}, "name")
 				.then(r => {
@@ -92,11 +103,24 @@ frappe.ui.form.on('Service Request', {
 			}, __('Create'));
 
 		} else if (frm.doc.template_dt === "Observation Template") {
-			frm.add_custom_button(__('Observation'), function() {
-				frm.trigger('make_observation');
-			}, __('Create'));
-
-		}
+            if (frm.doc.sales_invoice) {
+                frappe.db.get_value("Sales Invoice", frm.doc.sales_invoice, "status")
+                .then(r => {
+                    if ( r.message.status === "Paid") {
+                        frm.add_custom_button(__('Observation'), function () {
+                            frm.trigger('make_observation');
+                        }, __('Create'));
+                    }
+                    else {
+                        frappe.msgprint("Service Request need to be <b>Paid</b> before proceeding");
+                    }
+                });
+            }
+            else {
+                frappe.msgprint("Service Request need to be <b>invoice</b> before proceeding");
+            }
+ 
+        }
 
 		frm.page.set_inner_btn_group_as_primary(__('Create'));
 	},

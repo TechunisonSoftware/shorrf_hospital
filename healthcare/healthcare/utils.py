@@ -582,7 +582,7 @@ def manage_invoice_submit_cancel(doc, method):
 					)
 
 
-def set_invoiced(item, method, ref_invoice=None):
+def set_invoiced(item, method, sales_id):
 	invoiced = False
 	if method == "on_submit":
 		validate_invoiced_on_submit(item)
@@ -620,7 +620,7 @@ def set_invoiced(item, method, ref_invoice=None):
 		# if order is invoiced, set both order and service transaction as invoiced
 		hso = frappe.get_doc(item.reference_dt, item.reference_dn)
 		if invoiced:
-			hso.update_invoice_details(item.qty)
+			hso.update_invoice_details(item.qty,sales_id)
 		else:
 			hso.update_invoice_details(item.qty * -1)
 
@@ -682,12 +682,12 @@ def get_drugs_to_invoice(encounter, customer, link_customer=False):
 		if patient:
 			orders_to_invoice = []
 			medication_requests = frappe.get_list(
-				"Medication Request",
+				"Pharmacy Prescription",
 				fields=["*"],
 				filters={
 					"patient": patient.name,
 					"order_group": encounter.name,
-					"billing_status": ["in", ["Pending", "Partly Invoiced"]],
+					"billing_status": ["in", ["Dispensed", "Partly Dispensed"]],
 					"docstatus": 1,
 				},
 			)
