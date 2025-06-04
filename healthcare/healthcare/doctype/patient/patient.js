@@ -211,12 +211,20 @@ let create_medical_record = function (frm) {
 	frappe.new_doc('Patient Medical Record');
 };
 
-let get_age = function (birth) {
-	let birth_moment = moment(birth);
-	let current_moment = moment(Date());
-	let diff = moment.duration(current_moment.diff(birth_moment));
-	return `${diff.years()} ${__('Year(s)')} ${diff.months()} ${__('Month(s)')} ${diff.days()} ${__('Day(s)')}`
-};
+function get_age(birth) {
+    const birthDate = moment(birth).startOf('day');
+    const today = moment().startOf('day');
+ 
+    let years = today.diff(birthDate, 'years');
+    let tempDate = birthDate.clone().add(years, 'years');
+ 
+    let months = today.diff(tempDate, 'months');
+    tempDate.add(months, 'months');
+ 
+    let days = today.diff(tempDate, 'days');
+ 
+    return `${years} ${__('Year(s)')} ${months} ${__('Month(s)')} ${days} ${__('Day(s)')}`;
+}
 
 let create_vital_signs = function (frm) {
 	if (!frm.doc.name) {

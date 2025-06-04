@@ -10,6 +10,7 @@
  "engine": "InnoDB",
  "field_order": [
   "company",
+  "patient_id_card_issued",
   "basic_info",
   "naming_series",
   "first_name",
@@ -533,13 +534,19 @@
    "fieldname": "patient_age",
    "fieldtype": "Data",
    "label": "Age"
+  },
+  {
+   "default": "0",
+   "fieldname": "patient_id_card_issued",
+   "fieldtype": "Check",
+   "label": "Patient ID Card Issued"
   }
  ],
  "icon": "fa fa-user",
  "image_field": "image",
  "links": [],
  "max_attachments": 50,
- "modified": "2025-05-15 09:35:47.384061",
+ "modified": "2025-06-04 15:56:16.186737",
  "modified_by": "Administrator",
  "module": "Healthcare",
  "name": "Patient",
