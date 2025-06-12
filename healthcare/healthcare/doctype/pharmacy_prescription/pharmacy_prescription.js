@@ -90,7 +90,7 @@ function bind_medication_request_data(frm) {
                                 }
                             });
                         }
-                    }
+                }
                 });
 
                 frm.refresh_field('drug_prescription');
@@ -146,8 +146,8 @@ function process_medication(frm, button) {
             
                     selected_items.push({
                         item: row.medication,
-                        source_warehouse: `Stores - ${company_abbreviation}`,
-                        target_warehouse: `Work In Progress - ${company_abbreviation}`,
+                        source_warehouse: `Pharmacy Counter - ${company_abbreviation}`,
+                        target_warehouse: `Dispensed to Patient - ${company_abbreviation}`,
                         quantity: row.dispensed_amount || r.message || 0,
                         available_stock: r.message,
                         row_name: row.name,

@@ -28,7 +28,7 @@ def create_stock_entry(prescription_name, item, source_warehouse, target_warehou
         # Create Stock Entry
         stock_entry = frappe.get_doc({
             'doctype': 'Stock Entry',
-            'stock_entry_type': 'Material Transfer',
+            'stock_entry_type': 'Material Issue',
             'items': [
                 {
                     'item_code': item,
