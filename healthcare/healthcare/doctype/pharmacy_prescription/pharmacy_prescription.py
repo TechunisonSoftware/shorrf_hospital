@@ -19,10 +19,10 @@ def get_medication_quantity(order_group, medication_item):
     return medication_requests[0].get('quantity') if medication_requests else None
 
 @frappe.whitelist()
-def create_stock_entry(prescription_name, item, source_warehouse, target_warehouse, quantity):
+def create_stock_entry(prescription_name, item, source_warehouse, quantity):
     """Create a stock entry for the dispensed medication"""
     try:
-        if not all([item, source_warehouse, target_warehouse, quantity]):
+        if not all([item, source_warehouse, quantity]):
             frappe.throw("All fields are required to create a Stock Entry.")
 
         # Create Stock Entry
@@ -34,7 +34,7 @@ def create_stock_entry(prescription_name, item, source_warehouse, target_warehou
                     'item_code': item,
                     'qty': float(quantity),
                     's_warehouse': source_warehouse,
-                    't_warehouse': target_warehouse
+                    # 't_warehouse': target_warehouse
                 }
             ]
         })
@@ -136,7 +136,7 @@ def get_item_rate(item_code):
     if not item_code:
         return 0
     
-    print("Item code ",item_code)
+    # print("Item code ",item_code)
  
     # First try Item Price (Selling)
     price = frappe.get_value("Item Price", {

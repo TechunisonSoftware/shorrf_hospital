@@ -147,7 +147,7 @@ function process_medication(frm, button) {
                     selected_items.push({
                         item: row.medication,
                         source_warehouse: `Pharmacy Counter - ${company_abbreviation}`,
-                        target_warehouse: `Dispensed to Patient - ${company_abbreviation}`,
+                        // target_warehouse: `Dispensed to Patient - ${company_abbreviation}`,
                         quantity: row.dispensed_amount || r.message || 0,
                         available_stock: r.message,
                         row_name: row.name,
@@ -179,7 +179,9 @@ function process_medication(frm, button) {
                 }
             },
             // { fieldtype: 'Column Break' },
-            { fieldtype: 'Link', fieldname: `target_warehouse_${item.row_name}`, label: 'Target Warehouse', options: 'Warehouse',reqd: 1, default: item.target_warehouse },
+            // { fieldtype: 'Link', fieldname: `target_warehouse_${item.row_name}`, label: 'Target Warehouse', options: 'Warehouse',reqd: 1, default: item.target_warehouse },
+            { fieldtype: 'Column Break' },
+            { fieldtype: 'Read Only', fieldname: `available_stock_${item.row_name}`, label: 'Available Stock', default: item.available_stock },
             { fieldtype: 'Column Break' },
             { fieldtype: 'Float', fieldname: `quantity_${item.row_name}`, label: 'Quantity', reqd: 1,default: item.quantity ,change: () => {
                 let qty = dialog.get_value(`quantity_${item.row_name}`);
@@ -190,11 +192,13 @@ function process_medication(frm, button) {
             { fieldtype: 'Currency', fieldname: `rate_${item.row_name}`, label: 'Rate (as per)', default: item.rate, read_only: 1 },
             { fieldtype: 'Column Break' },
             { fieldtype: 'Currency', fieldname: `total_${item.row_name}`, label: 'Total', default: item.total, read_only: 1  },
-            { fieldtype: 'Column Break' },
-            { fieldtype: 'Read Only', fieldname: `available_stock_${item.row_name}`, label: 'Available Stock', default: item.available_stock },
         ]).flat();
         fields.push(
             { fieldtype: 'Section Break' },
+            { fieldtype: 'Column Break' },
+            { fieldtype: 'Column Break' },
+            { fieldtype: 'Column Break' },
+            { fieldtype: 'Column Break' },
             { fieldtype: 'Currency', fieldname: 'grand_total', label: 'Grand Total', read_only: 1, default: 0 }
         );
  
@@ -255,7 +259,7 @@ function process_medication(frm, button) {
                                     prescription_name: frm.doc.name,
                                     item: data[`item_${item.row_name}`],
                                     source_warehouse: data[`source_warehouse_${item.row_name}`],
-                                    target_warehouse: data[`target_warehouse_${item.row_name}`],
+                                    // target_warehouse: data[`target_warehouse_${item.row_name}`],
                                     quantity: data[`quantity_${item.row_name}`]
                                 },
                                 callback(response) {
@@ -286,7 +290,7 @@ function process_medication(frm, button) {
         dialog.show();
 
         selected_items.forEach((item , index)=> {
-            console.log(`Calling fetch for item ${index}: ${item.item}`);
+            // console.log(`Calling fetch for item ${index}: ${item.item}`);
             
             dialog.set_value(`quantity_${item.row_name}`, item.quantity);
             fetch_item_rate(item.item, item.row_name, item.quantity, index);
@@ -327,7 +331,7 @@ function process_medication(frm, button) {
                     let grand_total = totalsArray.reduce((acc, val) => acc + val, 0);
                     dialog.set_value('grand_total', grand_total);
  
-                    console.log(`Updated grand total: ${grand_total}`);
+                    // console.log(`Updated grand total: ${grand_total}`);
                 }
             });
         }
