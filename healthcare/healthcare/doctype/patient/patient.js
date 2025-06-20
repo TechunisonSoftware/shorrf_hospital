@@ -137,6 +137,17 @@ frappe.ui.form.on('Patient', {
 			frm.set_value('patient_age','')
 			
 		}
+		if (frm.doc.uid && !frm.doc.patient_barcode) {
+            const svg_html = frm.fields_dict.patient_barcode.get_barcode_html(frm.doc.uid);
+            // console.log("SVGGGGGGGGGGGGGGGGGGGGGGG",svg_html);
+ 
+            frm.set_value("patient_barcode", svg_html).then(() => {
+                // Save the form automatically
+                if (!frm.doc.__islocal) {
+                    frm.save();
+                }
+            });
+        }
 		hiding_barcode(frm)
 
 	},

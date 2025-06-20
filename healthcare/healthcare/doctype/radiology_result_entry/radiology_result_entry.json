@@ -39,6 +39,7 @@
   "reported_practitioner_section",
   "reported_practitioner",
   "reported_practitioner_name",
+  "reported_practitioner_email",
   "column_break_gfxp",
   "reported_practitioner_department",
   "reported_practitioner_mobile",
@@ -740,12 +741,21 @@
    "fieldtype": "Data",
    "label": "Reported Practitioner Name",
    "read_only": 1
+  },
+  {
+   "fetch_from": "reported_practitioner.user_id",
+   "fieldname": "reported_practitioner_email",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Reported Practitioner Email",
+   "options": "Email",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-05-02 11:15:36.302042",
+ "modified": "2025-06-20 12:49:00.281553",
  "modified_by": "Administrator",
  "module": "Healthcare",
  "name": "Radiology Result Entry",
