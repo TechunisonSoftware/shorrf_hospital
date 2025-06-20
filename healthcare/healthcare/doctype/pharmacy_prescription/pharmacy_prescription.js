@@ -181,9 +181,9 @@ function process_medication(frm, button) {
             // { fieldtype: 'Column Break' },
             // { fieldtype: 'Link', fieldname: `target_warehouse_${item.row_name}`, label: 'Target Warehouse', options: 'Warehouse',reqd: 1, default: item.target_warehouse },
             { fieldtype: 'Column Break' },
-            { fieldtype: 'Read Only', fieldname: `available_stock_${item.row_name}`, label: 'Available Stock', default: item.available_stock },
+            { fieldtype: 'Int', fieldname: `available_stock_${item.row_name}`, label: 'Available Stock',input_class: 'text-right', default: item.available_stock },
             { fieldtype: 'Column Break' },
-            { fieldtype: 'Float', fieldname: `quantity_${item.row_name}`, label: 'Quantity', reqd: 1,default: item.quantity ,change: () => {
+            { fieldtype: 'Float', fieldname: `quantity_${item.row_name}`, label: 'Quantity', reqd: 1,input_class: 'text-right',default: item.quantity ,change: () => {
                 let qty = dialog.get_value(`quantity_${item.row_name}`);
                 fetch_item_rate(item.item, item.row_name, qty, index);
             }},
@@ -288,6 +288,11 @@ function process_medication(frm, button) {
         });
 
         dialog.show();
+        frappe.dom.set_style(`
+	        .frappe-control[data-fieldtype="Currency"] .control-input-wrapper {
+                text-align: right !important;
+            }
+        `);
 
         selected_items.forEach((item , index)=> {
             // console.log(`Calling fetch for item ${index}: ${item.item}`);
