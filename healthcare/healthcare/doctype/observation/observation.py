@@ -136,7 +136,8 @@ class Observation(Document):
 				}
 				# print(request_body)
 				# print("**********************************************************************************")
-				request_to_modality(request_body,self)	
+				# request_to_modality(request_body,self)
+				create_radiology_report_entry(self, request_body)					
 
 	def on_cancel(self):
 		if self.service_request:

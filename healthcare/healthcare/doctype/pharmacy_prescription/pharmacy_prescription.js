@@ -63,14 +63,14 @@ function bind_medication_request_data(frm) {
             if (r.message) {
                 let medication_requests = r.message;
                 frm.doc.drug_prescription.forEach(row => {
-                    let request = medication_requests.find(req => req.medication_item === row.medication);
+                    let request = medication_requests.find(req => req.medication_item === row.drug_code);
                     if (request) {
                         frappe.model.set_value(row.doctype, row.name, 'medication_request', request.name);
                         
                         // Fetch and bind quantity
                         frappe.call({
                             method: 'healthcare.healthcare.doctype.pharmacy_prescription.pharmacy_prescription.get_medication_quantity',
-                            args: { order_group: frm.doc.patient_encounter, medication_item: row.medication },
+                            args: { order_group: frm.doc.patient_encounter, medication_item: row.drug_code },
                             callback(quantity_response) {
                                 if (quantity_response.message) {
                                     frappe.model.set_value(row.doctype, row.name, 'qty', quantity_response.message);
@@ -139,13 +139,14 @@ function process_medication(frm, button) {
                 method: 'healthcare.healthcare.doctype.pharmacy_prescription.pharmacy_prescription.get_medication_quantity',
                 args: { 
                     order_group: frm.doc.patient_encounter, 
-                    medication_item: row.medication 
+                    medication_item: row.drug_code 
                 },
                 callback(r) {
                     let company_abbreviation = frm.doc.company_abbreviation || "T";  // Fallback to 'T' if not available
             
                     selected_items.push({
-                        item: row.medication,
+                        medication : row.medication,
+                        item: row.drug_code,
                         source_warehouse: `Pharmacy Counter - ${company_abbreviation}`,
                         // target_warehouse: `Dispensed to Patient - ${company_abbreviation}`,
                         quantity: row.dispensed_amount || r.message || 0,
@@ -167,7 +168,7 @@ function process_medication(frm, button) {
         }
 
         let fields = selected_items.map((item , index)=> [
-            { fieldtype: 'Section Break', label: `Medication: ${item.item}` },
+            { fieldtype: 'Section Break', label: `Medication: ${item.medication}` },
             { fieldtype: 'Link', fieldname: `item_${item.row_name}`, label: 'Item', options: 'Item', reqd: 1, default: item.item},
             { fieldtype: 'Column Break' },
             {

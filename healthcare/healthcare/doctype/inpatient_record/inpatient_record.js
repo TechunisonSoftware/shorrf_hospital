@@ -70,8 +70,24 @@ frappe.ui.form.on('Inpatient Record', {
 				"reference_name": frm.doc.name}
 					frappe.new_doc("Clinical Note");
 		},__('Create'));
-		$('button[data-doctype="Clinical Note"]').hide();
-		
+		// $('button[data-doctype="Clinical Note"]').hide();
+		// Find the Clinical Note "+" button in Connections section
+        const btn = $(`.form-dashboard .section-body button[data-doctype="Clinical Note"]`);
+        if (btn.length) {
+            // Remove the existing click handler
+            btn.off('click');
+            // Add your own click handler
+            btn.on('click', function (e) {
+                e.preventDefault(); // Prevent default behavior
+ 
+                // Your custom creation logic
+                frappe.new_doc('Clinical Note', {
+                    reference_doc: 'Inpatient Record',
+                    reference_name: frm.doc.name,
+                    patient: frm.doc.patient
+                });
+            });
+        }		
 	},
 	btn_transfer: function(frm) {
 		transfer_patient_dialog(frm);

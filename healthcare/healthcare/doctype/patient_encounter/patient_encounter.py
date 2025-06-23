@@ -518,12 +518,16 @@ def get_medications_query(doctype, txt, searchfield, start, page_len, filters):
 			display_list.append(d.get("brand"))
 		if d.get("manufacturer"):
 			display_list.append(d.get("manufacturer"))
-		default_warehouse = frappe.get_cached_value("Stock Settings", None, "default_warehouse")
+		company = filters.get("company")  # FIXED
+		abbr = frappe.get_value("Company", company, "abbr")
+		default_warehouse = f"Pharmacy Counter - {abbr}"  # FIXED
+		# default_warehouse = frappe.get_cached_value("Stock Settings", None, "default_warehouse")
 		if default_warehouse:
 			actual_qty = frappe.db.get_value(
-				"Bin", {"warehouse": default_warehouse, "item_code": d.get("name")}, "actual_qty"
-			)
-			display_list.append("Qty:" + str(actual_qty) if actual_qty else "0")
+                "Bin", {"warehouse": default_warehouse, "item_code": d.get("item")}, "actual_qty"
+            )
+			actual_qty = round(actual_qty) if actual_qty is not None else 0
+			display_list.append(f"Qty:{actual_qty}")
 		data_list.append(display_list)
 	res = tuple(tuple(sub) for sub in data_list)
 	return res
