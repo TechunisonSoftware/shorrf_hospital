@@ -462,9 +462,21 @@
   {
    "link_doctype": "Clinical Note",
    "link_fieldname": "reference_name"
+  },
+  {
+   "link_doctype": "Inpatient Medication Order",
+   "link_fieldname": "inpatient_record"
+  },
+  {
+   "link_doctype": "Clinical Procedure",
+   "link_fieldname": "inpatient_record"
+  },
+  {
+   "link_doctype": "Therapy Plan",
+   "link_fieldname": "inpatient_record"
   }
  ],
- "modified": "2025-02-13 11:15:06.726406",
+ "modified": "2025-06-20 15:20:35.527397",
  "modified_by": "Administrator",
  "module": "Healthcare",
  "name": "Inpatient Record",

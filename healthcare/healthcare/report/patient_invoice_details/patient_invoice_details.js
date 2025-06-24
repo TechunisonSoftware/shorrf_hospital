@@ -28,7 +28,8 @@ frappe.query_reports["Patient Invoice Details"] = {
               frappe.query_report.set_filter_value("from_date", scheduled_date);
               frappe.query_report.set_filter_value("to_date", frappe.datetime.get_today());
             } else {
-              frappe.query_report.set_filter_value("from_date", "");
+              const from_date = frappe.datetime.add_days(to_date, -30);
+              frappe.query_report.set_filter_value("from_date", from_date);
               frappe.query_report.set_filter_value("to_date", frappe.datetime.get_today());
               frappe.msgprint("No active Inpatient Record found. Please select dates manually.");
             }
@@ -55,30 +56,30 @@ frappe.query_reports["Patient Invoice Details"] = {
       default: ""
     }
   ],
-onload: function (report) {
-  report.page.add_inner_button("Print Report", () => {
-    const filters = report.get_filter_values();
-    if (!filters.patient || !filters.from_date || !filters.to_date) {
-      frappe.msgprint("Please select Patient, From Date, and To Date.");
-      return;
-    }
-
-    frappe.call({
-      method: "healthcare.healthcare.report.patient_invoice_details.patient_invoice_details.create_patient_invoice_summary",
-      args: {
-        patient: filters.patient,
-        from_date: filters.from_date,
-        to_date: filters.to_date,
-        invoice_status: filters.invoice_status || null
-      },
-      callback: function (r) {
-        if (r.message) {
-          frappe.set_route("print", "Patient Sales Invoice Report", r.message);
-        }
+  onload: function (report) {
+    report.page.add_inner_button("Print Report", () => {
+      const filters = report.get_filter_values();
+      if (!filters.patient || !filters.from_date || !filters.to_date) {
+        frappe.msgprint("Please select Patient, From Date, and To Date.");
+        return;
       }
+
+      frappe.call({
+        method: "healthcare.healthcare.report.patient_invoice_details.patient_invoice_details.create_patient_invoice_summary",
+        args: {
+          patient: filters.patient,
+          from_date: filters.from_date,
+          to_date: filters.to_date,
+          invoice_status: filters.invoice_status || null
+        },
+        callback: function (r) {
+          if (r.message) {
+            frappe.set_route("print", "Patient Sales Invoice Report", r.message);
+          }
+        }
+      });
     });
-  });
-}
+  }
 
 
 };
