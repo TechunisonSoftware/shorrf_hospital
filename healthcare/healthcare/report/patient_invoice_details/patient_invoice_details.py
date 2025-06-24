@@ -72,7 +72,9 @@ def create_patient_invoice_summary(patient, from_date, to_date, invoice_status=N
     return doc.name
 
 
-def get_invoice_table_html(patient, from_date, to_date, invoice_status=None):
+def get_invoice_table_html(
+    patient, from_date, to_date, invoice_status=None, net_total=0, advance_total=0, grand_total=0
+):
     conditions = "si.patient = %s AND si.posting_date BETWEEN %s AND %s"
     params = [patient, from_date, to_date]
 
