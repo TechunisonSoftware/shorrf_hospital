@@ -137,6 +137,17 @@ frappe.ui.form.on('Patient', {
 			frm.set_value('patient_age','')
 			
 		}
+		if (frm.doc.uid && !frm.doc.patient_barcode) {
+            const svg_html = frm.fields_dict.patient_barcode.get_barcode_html(frm.doc.uid);
+            // console.log("SVGGGGGGGGGGGGGGGGGGGGGGG",svg_html);
+ 
+            frm.set_value("patient_barcode", svg_html).then(() => {
+                // Save the form automatically
+                if (!frm.doc.__islocal) {
+                    frm.save();
+                }
+            });
+        }
 		hiding_barcode(frm)
 
 	},
@@ -211,12 +222,20 @@ let create_medical_record = function (frm) {
 	frappe.new_doc('Patient Medical Record');
 };
 
-let get_age = function (birth) {
-	let birth_moment = moment(birth);
-	let current_moment = moment(Date());
-	let diff = moment.duration(current_moment.diff(birth_moment));
-	return `${diff.years()} ${__('Year(s)')} ${diff.months()} ${__('Month(s)')} ${diff.days()} ${__('Day(s)')}`
-};
+function get_age(birth) {
+    const birthDate = moment(birth).startOf('day');
+    const today = moment().startOf('day');
+ 
+    let years = today.diff(birthDate, 'years');
+    let tempDate = birthDate.clone().add(years, 'years');
+ 
+    let months = today.diff(tempDate, 'months');
+    tempDate.add(months, 'months');
+ 
+    let days = today.diff(tempDate, 'days');
+ 
+    return `${years} ${__('Year(s)')} ${months} ${__('Month(s)')} ${days} ${__('Day(s)')}`;
+}
 
 let create_vital_signs = function (frm) {
 	if (!frm.doc.name) {

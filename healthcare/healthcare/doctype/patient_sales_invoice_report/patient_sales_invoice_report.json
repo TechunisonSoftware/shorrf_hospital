@@ -1,0 +1,202 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2025-06-19 12:27:18.104115",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "basic_info",
+  "naming_series",
+  "patient_name",
+  "sex",
+  "dob",
+  "aadhar_number",
+  "patient_age",
+  "company",
+  "from_date",
+  "to_date",
+  "column_break_14",
+  "registration_date",
+  "customer",
+  "first_name",
+  "last_name",
+  "uid",
+  "patient_barcode",
+  "mobile",
+  "section_break_rozg",
+  "html_content"
+ ],
+ "fields": [
+  {
+   "fieldname": "basic_info",
+   "fieldtype": "Section Break",
+   "label": "Patient Demographics",
+   "oldfieldtype": "Section Break",
+   "options": "fa fa-user"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "HLC-PAT-INVOICE.YYYY.-",
+   "print_hide": 1,
+   "report_hide": 1,
+   "set_only_once": 1
+  },
+  {
+   "bold": 1,
+   "fieldname": "patient_name",
+   "fieldtype": "Data",
+   "in_global_search": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Full Name",
+   "no_copy": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "sex",
+   "fieldtype": "Link",
+   "in_preview": 1,
+   "label": "Gender",
+   "options": "Gender",
+   "reqd": 1
+  },
+  {
+   "bold": 1,
+   "fieldname": "dob",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "DOB",
+   "no_copy": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_14",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "If \"Link Customer to Patient\" is checked in Healthcare Settings and an existing Customer is not selected then, a Customer will be created for this Patient for recording transactions in Accounts module.",
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "label": "Customer",
+   "no_copy": 1,
+   "options": "Customer",
+   "set_only_once": 1
+  },
+  {
+   "bold": 1,
+   "fieldname": "mobile",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Mobile",
+   "no_copy": 1,
+   "options": "Phone",
+   "reqd": 1
+  },
+  {
+   "fieldname": "last_name",
+   "fieldtype": "Data",
+   "label": "Last Name",
+   "no_copy": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "first_name",
+   "fieldtype": "Data",
+   "label": "First Name",
+   "no_copy": 1,
+   "oldfieldtype": "Data",
+   "reqd": 1
+  },
+  {
+   "fieldname": "uid",
+   "fieldtype": "Data",
+   "in_standard_filter": 1,
+   "label": "UID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "patient_barcode",
+   "fieldtype": "Barcode",
+   "label": "Patient Barcode"
+  },
+  {
+   "fieldname": "registration_date",
+   "fieldtype": "Data",
+   "label": "Registration Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "aadhar_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Aadhar Number",
+   "mandatory_depends_on": "eval:doc.not_having_aadhar==0"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Centre",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "patient_age",
+   "fieldtype": "Data",
+   "label": "Age"
+  },
+  {
+   "fieldname": "section_break_rozg",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "html_content",
+   "fieldtype": "HTML Editor",
+   "label": "Invoice Table"
+  },
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "label": "From Date"
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "label": "To Date"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-06-20 10:28:57.541722",
+ "modified_by": "Administrator",
+ "module": "Healthcare",
+ "name": "Patient Sales Invoice Report",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "patient_name"
+}

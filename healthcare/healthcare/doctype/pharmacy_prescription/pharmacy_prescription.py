@@ -19,22 +19,22 @@ def get_medication_quantity(order_group, medication_item):
     return medication_requests[0].get('quantity') if medication_requests else None
 
 @frappe.whitelist()
-def create_stock_entry(prescription_name, item, source_warehouse, target_warehouse, quantity):
+def create_stock_entry(prescription_name, item, source_warehouse, quantity):
     """Create a stock entry for the dispensed medication"""
     try:
-        if not all([item, source_warehouse, target_warehouse, quantity]):
+        if not all([item, source_warehouse, quantity]):
             frappe.throw("All fields are required to create a Stock Entry.")
 
         # Create Stock Entry
         stock_entry = frappe.get_doc({
             'doctype': 'Stock Entry',
-            'stock_entry_type': 'Material Transfer',
+            'stock_entry_type': 'Material Issue',
             'items': [
                 {
                     'item_code': item,
                     'qty': float(quantity),
                     's_warehouse': source_warehouse,
-                    't_warehouse': target_warehouse
+                    # 't_warehouse': target_warehouse
                 }
             ]
         })
@@ -129,3 +129,23 @@ def update_dispensed_amount(row_name, new_dispensed_amount):
     doc.save()
     frappe.db.commit()
     return "Updated"
+
+@frappe.whitelist()
+def get_item_rate(item_code):
+    """Fetch price rate of an item from Item Price or Item master"""
+    if not item_code:
+        return 0
+    
+    # print("Item code ",item_code)
+ 
+    # First try Item Price (Selling)
+    price = frappe.get_value("Item Price", {
+        "item_code": item_code,
+        "selling": 1
+    }, "price_list_rate")
+ 
+    # If not found, fallback to Item master 'standard_rate'
+    if price is None:
+        price = frappe.get_value("Item", item_code, "standard_rate")
+ 
+    return price or 0

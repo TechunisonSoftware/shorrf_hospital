@@ -17,4 +17,5 @@ healthcare.patches.v15_0.setup_diagnostic_module_codes
 healthcare.patches.v15_0.setup_order_status_codes
 healthcare.patches.v15_0.setup_radiology_setting
 healthcare.patches.v15_0.add_uid_to_existing_patients
+healthcare.patches.v15_0.calculate_age_for_existing_patient_using_dob
 

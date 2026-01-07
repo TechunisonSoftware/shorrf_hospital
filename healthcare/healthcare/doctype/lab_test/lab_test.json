@@ -42,6 +42,7 @@
   "practitioner",
   "practitioner_name",
   "requesting_department",
+  "requesting_practitioner_email",
   "employee",
   "employee_name",
   "employee_designation",
@@ -657,6 +658,15 @@
    "fieldtype": "Text",
    "ignore_xss_filter": 1,
    "label": "Comments"
+  },
+  {
+   "fetch_from": "practitioner.user_id",
+   "fieldname": "requesting_practitioner_email",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Requesting Practitioner Email",
+   "options": "Email",
+   "read_only": 1
   }
  ],
  "is_submittable": 1,
@@ -671,7 +681,7 @@
    "table_fieldname": "observation_sample_collection"
   }
  ],
- "modified": "2025-05-21 12:46:46.760064",
+ "modified": "2025-06-20 12:40:06.381542",
  "modified_by": "Administrator",
  "module": "Healthcare",
  "name": "Lab Test",

@@ -168,11 +168,17 @@
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
- "links": [],
- "modified": "2025-03-28 10:44:02.714961",
+ "links": [
+  {
+   "link_doctype": "Inpatient Medication Entry",
+   "link_fieldname": "against_imo"
+  }
+ ],
+ "modified": "2025-06-24 15:37:56.504149",
  "modified_by": "Administrator",
  "module": "Healthcare",
  "name": "Inpatient Medication Order",
+ "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [
   {

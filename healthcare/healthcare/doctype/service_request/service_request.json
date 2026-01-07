@@ -74,7 +74,8 @@
   "template_dn",
   "sample_collection_required",
   "qty_invoiced",
-  "billing_status"
+  "billing_status",
+  "sales_invoice"
  ],
  "fields": [
   {
@@ -526,6 +527,12 @@
    "fieldtype": "Data",
    "label": "Practitioner Email",
    "read_only": 1
+  },
+  {
+   "fieldname": "sales_invoice",
+   "fieldtype": "Link",
+   "label": "Sales Invoice",
+   "options": "Sales Invoice"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -544,7 +551,7 @@
    "link_fieldname": "service_request"
   }
  ],
- "modified": "2024-01-09 13:03:51.377653",
+ "modified": "2025-05-30 15:51:18.223274",
  "modified_by": "Administrator",
  "module": "Healthcare",
  "name": "Service Request",

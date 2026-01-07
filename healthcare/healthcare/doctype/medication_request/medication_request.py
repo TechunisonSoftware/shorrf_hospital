@@ -50,7 +50,7 @@ class MedicationRequest(ServiceRequestController):
         else:
             self.total_dispensable_quantity = self.quantity
 
-    def update_invoice_details(self, qty):
+    def update_invoice_details(self, qty,sales_id):
         """
         updates qty_invoiced and set billing status
         """

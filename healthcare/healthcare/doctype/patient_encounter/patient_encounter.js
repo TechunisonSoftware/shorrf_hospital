@@ -260,7 +260,7 @@ frappe.ui.form.on('Patient Encounter', {
 				if (row.medication) {
 					return {
 						query: 'healthcare.healthcare.doctype.patient_encounter.patient_encounter.get_medications_query',
-						filters: { name: row.medication }
+						filters: { name: row.medication, company: frm.doc.company}
 					};
 				} else {
 					return {
